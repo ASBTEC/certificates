@@ -165,4 +165,5 @@ out
 !out/.gitkeep
 secrets
 !secrets/.gitkeep
-.env
+.envsrc/output.png
+src/output.png
