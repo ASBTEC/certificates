@@ -3,7 +3,7 @@ name: buildAndSendSignatures
 on:
   push:
     branches:
-      - 'master'
+      - 'test'
     paths:
       - 'data/**.json'
       - 'templates/template.html'
