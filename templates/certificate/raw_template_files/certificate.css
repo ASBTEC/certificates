@@ -4,6 +4,10 @@
     --1vh: var(--inner1Vh, 1vh);
 }
 
+@page {
+    size: A4 landscape !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
     .animated {
         animation: none !important;

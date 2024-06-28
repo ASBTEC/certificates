@@ -121,3 +121,10 @@ them into a workflow file that manages a certain signature.
 ## Acknowledgements
 Shout out to [@Bpazg97](https://github.com/Bpazg97) who suggested the usage of HandleBars which suited the job 
 perfectly.  
+
+
+
+
+
+# some commands that I used in this fork
+wkhtmltopdf --enable-local-file-access --margin-right 0 --margin-left 0 --margin-bottom 0 --margin-top 0 --orientation Landscape --page-size A4 templates/certificate/raw_template.html mypage.pdf
