@@ -28,4 +28,4 @@ async function convertHtmlToPdf(htmlFilePath, pdfFilePath) {
 }
 
 // Replace 'input.html' with your HTML file path and 'output.pdf' with desired PDF file path
-convertHtmlToPdf('../templates/certificate/raw_template.html', 'output.pdf');
+convertHtmlToPdf('../templates/template.html', 'output.pdf');
