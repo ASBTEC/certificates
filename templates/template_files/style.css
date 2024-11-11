@@ -46,9 +46,6 @@ a {
 
 img {
     -webkit-user-drag: none;
-    -moz-user-drag: none;
-    -o-user-drag: none;
-    user-drag: none;
     -webkit-touch-callout: none;
 }
 
@@ -167,8 +164,8 @@ img {
         clip-path: polygon(calc(39.66738303% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(39.66738303% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -175.47373323%;
         margin-right: -166.88903397%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #GUwXkSdohBM9rnyy {
@@ -190,30 +187,21 @@ img {
         grid-area: 2 / 34 / 18 / 43;
         position: relative;
         clip-path: polygon(calc(0% + 0%) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc(100% - ((0 * 24.17729982rem) + 0%)), calc(0% + 0%) calc(100% - ((0 * 24.17729982rem) + 0%)));
-        margin-left: 0%;
-        margin-right: -5.27600533%;
-        margin-bottom: 0%;
-        margin-top: -10.87205134%;
+        margin: -10.87205134% -5.27600533% 0 0;
     }
 
     #UptMmOYhobRhfMxj {
         grid-area: 3 / 37 / 19 / 44;
         position: relative;
         clip-path: polygon(calc(0% + -13.02071756%) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)), calc(0% + -13.02071756%) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)));
-        margin-left: 0%;
-        margin-right: -63.23944245%;
-        margin-bottom: 0%;
-        margin-top: -16.85804466%;
+        margin: -16.85804466% -63.23944245% 0 0;
     }
 
     #ZcAzZKSt6CX1Ri50 {
         grid-area: 2 / 2 / 4 / 5;
         position: relative;
         clip-path: polygon(calc(37.72673614% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(37.72673614% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
-        margin-left: -166.88903397%;
-        margin-right: -175.47373323%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin: 0 -175.47373323% 0 -166.88903397%;
     }
 
     #ZBJIAMeCjcFBuVfl {
@@ -311,9 +299,9 @@ img {
         position: relative;
         clip-path: polygon(calc(38.74029554% + 0%) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)), calc(38.74029554% + 0%) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)));
         margin-left: -63.23944245%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -17.58702067%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #YBp3YCHJ7bjRzBbC {
@@ -321,9 +309,9 @@ img {
         position: relative;
         clip-path: polygon(calc(5.01159339% + 0%) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)), calc(5.01159339% + 0%) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)));
         margin-left: -5.27600533%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -6.37839461%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #zitue7epD06Eyg5Z {
@@ -478,8 +466,8 @@ img {
         clip-path: polygon(calc(39.66738303% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(39.66738303% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -175.47373323%;
         margin-right: -166.88903397%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #GUwXkSdohBM9rnyy {
@@ -501,9 +489,9 @@ img {
         grid-area: 2 / 34 / 18 / 43;
         position: relative;
         clip-path: polygon(calc(0% + 0%) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc(100% - ((0 * 24.17729982rem) + 0%)), calc(0% + 0%) calc(100% - ((0 * 24.17729982rem) + 0%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -5.27600533%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -10.87205134%;
     }
 
@@ -511,9 +499,9 @@ img {
         grid-area: 3 / 37 / 19 / 44;
         position: relative;
         clip-path: polygon(calc(0% + -13.02071756%) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)), calc(0% + -13.02071756%) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -63.23944245%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -16.85804466%;
     }
 
@@ -523,8 +511,8 @@ img {
         clip-path: polygon(calc(37.72673614% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(37.72673614% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -166.88903397%;
         margin-right: -175.47373323%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #ZBJIAMeCjcFBuVfl {
@@ -622,9 +610,9 @@ img {
         position: relative;
         clip-path: polygon(calc(38.74029554% + 0%) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)), calc(38.74029554% + 0%) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)));
         margin-left: -63.23944245%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -17.58702067%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #YBp3YCHJ7bjRzBbC {
@@ -632,9 +620,9 @@ img {
         position: relative;
         clip-path: polygon(calc(5.01159339% + 0%) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)), calc(5.01159339% + 0%) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)));
         margin-left: -5.27600533%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -6.37839461%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #zitue7epD06Eyg5Z {
@@ -789,8 +777,8 @@ img {
         clip-path: polygon(calc(39.66738303% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(39.66738303% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -175.47373323%;
         margin-right: -166.88903397%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #GUwXkSdohBM9rnyy {
@@ -812,9 +800,9 @@ img {
         grid-area: 2 / 34 / 18 / 43;
         position: relative;
         clip-path: polygon(calc(0% + 0%) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc(100% - ((0 * 24.17729982rem) + 0%)), calc(0% + 0%) calc(100% - ((0 * 24.17729982rem) + 0%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -5.27600533%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -10.87205134%;
     }
 
@@ -822,9 +810,9 @@ img {
         grid-area: 3 / 37 / 19 / 44;
         position: relative;
         clip-path: polygon(calc(0% + -13.02071756%) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)), calc(0% + -13.02071756%) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -63.23944245%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -16.85804466%;
     }
 
@@ -834,8 +822,8 @@ img {
         clip-path: polygon(calc(37.72673614% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(37.72673614% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -166.88903397%;
         margin-right: -175.47373323%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #ZBJIAMeCjcFBuVfl {
@@ -933,9 +921,9 @@ img {
         position: relative;
         clip-path: polygon(calc(38.74029554% + 0%) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)), calc(38.74029554% + 0%) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)));
         margin-left: -63.23944245%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -17.58702067%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #YBp3YCHJ7bjRzBbC {
@@ -943,9 +931,9 @@ img {
         position: relative;
         clip-path: polygon(calc(5.01159339% + 0%) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)), calc(5.01159339% + 0%) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)));
         margin-left: -5.27600533%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -6.37839461%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #zitue7epD06Eyg5Z {
@@ -1100,8 +1088,8 @@ img {
         clip-path: polygon(calc(39.66738303% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(39.66738303% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -175.47373323%;
         margin-right: -166.88903397%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #GUwXkSdohBM9rnyy {
@@ -1123,9 +1111,9 @@ img {
         grid-area: 2 / 34 / 18 / 43;
         position: relative;
         clip-path: polygon(calc(0% + 0%) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc(100% - ((0 * 24.17729982rem) + 0%)), calc(0% + 0%) calc(100% - ((0 * 24.17729982rem) + 0%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -5.27600533%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -10.87205134%;
     }
 
@@ -1133,9 +1121,9 @@ img {
         grid-area: 3 / 37 / 19 / 44;
         position: relative;
         clip-path: polygon(calc(0% + -13.02071756%) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)), calc(0% + -13.02071756%) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -63.23944245%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -16.85804466%;
     }
 
@@ -1145,8 +1133,8 @@ img {
         clip-path: polygon(calc(37.72673614% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(37.72673614% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -166.88903397%;
         margin-right: -175.47373323%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #ZBJIAMeCjcFBuVfl {
@@ -1244,9 +1232,9 @@ img {
         position: relative;
         clip-path: polygon(calc(38.74029554% + 0%) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)), calc(38.74029554% + 0%) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)));
         margin-left: -63.23944245%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -17.58702067%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #YBp3YCHJ7bjRzBbC {
@@ -1254,9 +1242,9 @@ img {
         position: relative;
         clip-path: polygon(calc(5.01159339% + 0%) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)), calc(5.01159339% + 0%) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)));
         margin-left: -5.27600533%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -6.37839461%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #zitue7epD06Eyg5Z {
@@ -1411,8 +1399,8 @@ img {
         clip-path: polygon(calc(39.66738303% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (37.72673614% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(39.66738303% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -175.47373323%;
         margin-right: -166.88903397%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #GUwXkSdohBM9rnyy {
@@ -1434,9 +1422,9 @@ img {
         grid-area: 2 / 34 / 18 / 43;
         position: relative;
         clip-path: polygon(calc(0% + 0%) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc((0.10872051 * 24.17729982rem) + 0%), calc(100% - (5.01159339% + 0%)) calc(100% - ((0 * 24.17729982rem) + 0%)), calc(0% + 0%) calc(100% - ((0 * 24.17729982rem) + 0%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -5.27600533%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -10.87205134%;
     }
 
@@ -1444,9 +1432,9 @@ img {
         grid-area: 3 / 37 / 19 / 44;
         position: relative;
         clip-path: polygon(calc(0% + -13.02071756%) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc((0.16858045 * 15.59236853rem) + 0%), calc(100% - (38.74029554% + 0%)) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)), calc(0% + -13.02071756%) calc(100% - ((0 * 15.59236853rem) + -5.88759774%)));
-        margin-left: 0%;
+        margin-left: 0;
         margin-right: -63.23944245%;
-        margin-bottom: 0%;
+        margin-bottom: 0;
         margin-top: -16.85804466%;
     }
 
@@ -1456,8 +1444,8 @@ img {
         clip-path: polygon(calc(37.72673614% + 0%) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc((0 * 14.85894365rem) + -118.6343938%), calc(100% - (39.66738303% + 0%)) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)), calc(37.72673614% + 0%) calc(100% - ((0 * 14.85894365rem) + -129.82642447%)));
         margin-left: -166.88903397%;
         margin-right: -175.47373323%;
-        margin-bottom: 0%;
-        margin-top: 0%;
+        margin-bottom: 0;
+        margin-top: 0;
     }
 
     #ZBJIAMeCjcFBuVfl {
@@ -1555,9 +1543,9 @@ img {
         position: relative;
         clip-path: polygon(calc(38.74029554% + 0%) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc((0 * 15.59236853rem) + -5.91165794%), calc(100% - (0% + -13.02071756%)) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)), calc(38.74029554% + 0%) calc(100% - ((0.17587021 * 15.59236853rem) + 0%)));
         margin-left: -63.23944245%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -17.58702067%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #YBp3YCHJ7bjRzBbC {
@@ -1565,9 +1553,9 @@ img {
         position: relative;
         clip-path: polygon(calc(5.01159339% + 0%) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc((0 * 24.17729982rem) + 0%), calc(100% - (0% + 0%)) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)), calc(5.01159339% + 0%) calc(100% - ((0.06378395 * 24.17729982rem) + 0%)));
         margin-left: -5.27600533%;
-        margin-right: 0%;
+        margin-right: 0;
         margin-bottom: -6.37839461%;
-        margin-top: 0%;
+        margin-top: 0;
     }
 
     #zitue7epD06Eyg5Z {
@@ -1891,7 +1879,7 @@ img {
     background-color: #ffffff;
     border-radius: 8px;
     margin: 0;
-    box-shadow: 0px 2px 18px 0px rgba(14, 19, 24, 0.25), 0px 0px 1px 0px rgba(14, 19, 24, 0.02);
+    box-shadow: 0 2px 18px 0 rgba(14, 19, 24, 0.25), 0 0 1px 0 rgba(14, 19, 24, 0.02);
     transition-duration: 0.35s;
     transition-property: opacity, transform, visibility;
     opacity: 0;
