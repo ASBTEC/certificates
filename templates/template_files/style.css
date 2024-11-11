@@ -11,14 +11,14 @@
 }
 
 html {
-    zoom: var(--rzf, 1);
-    font-size: max(calc(min(var(--1vw, 1vw), 13.66px) * var(--rfso, 1)), var(--minfs, 0px));
+    zoom: 1;
+    font-size: max(calc(min(var(--1vw, 1vw), 13.66px) * 1), 0px);
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
 }
 
 body {
-    font-size: calc(1rem * var(--bfso, 1));
+    font-size: 1rem;
 }
 
 body, html, p, ul, ol, li {
@@ -1751,7 +1751,7 @@ img {
     text-decoration: none;
     font-weight: 600;
     font-style: normal;
-    font-size: calc(12px * var(--rfso, var(--bfso, 1)));
+    font-size: 12px;
     color: #ffffff;
     transition: background-color 0.2s;
 }
@@ -1916,18 +1916,18 @@ img {
 }
 
 .form-title {
-    font-size: calc(24px * var(--rfso, var(--bfso, 1)));
+    font-size: 24px;
     font-weight: 700;
 }
 
 .form-body {
-    font-size: calc(14px * var(--rfso, var(--bfso, 1)));
+    font-size: 14px;
     font-weight: 400;
     color: rgba(14, 19, 24, 0.7);
 }
 
 .form-body-bold {
-    font-size: calc(14px * var(--rfso, var(--bfso, 1)));
+    font-size: 14px;
     font-weight: 600;
     line-height: 22.4px;
     color: rgba(14, 19, 24, 1);
@@ -1995,7 +1995,7 @@ img {
 
 .form-radio-label {
     grid-area: radio-label;
-    font-size: calc(14px * var(--rfso, var(--bfso, 1)));
+    font-size: 14px;
     font-weight: 600;
     line-height: 22.4px;
     color: rgba(14, 19, 24, 1);
@@ -2003,7 +2003,7 @@ img {
 
 .form-radio-desc {
     grid-area: radio-description;
-    font-size: calc(12px * var(--rfso, var(--bfso, 1)));
+    font-size: 12px;
     font-weight: 400;
     color: rgba(14, 19, 24, 0.7);
     margin: 0;
@@ -2118,7 +2118,7 @@ img {
 }
 
 .button-text {
-    font-size: calc(14px * var(--rfso, var(--bfso, 1)));
+    font-size: 14px;
     display: inline-block;
     max-width: 100%;
     overflow: hidden;
@@ -2150,7 +2150,7 @@ img {
     text-align: left;
     margin: 4px 0 0;
     color: #f84856;
-    font-size: calc(12px * var(--rfso, var(--bfso, 1)));
+    font-size: 12px;
 }
 
 .a-link:visited {
