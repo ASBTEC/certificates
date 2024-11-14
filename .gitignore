@@ -167,3 +167,7 @@ secrets
 !secrets/.gitkeep
 .envsrc/output.png
 src/output.png
+
+pngs_cropped
+pngs
+pdfs

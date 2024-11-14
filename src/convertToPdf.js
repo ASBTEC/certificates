@@ -3,6 +3,17 @@ const path = require('path');
 const sharp = require('sharp');
 const fs = require('fs');
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function exampleFunction() {
+    console.log("Before sleep");
+    await sleep(2000);  // Pauses for 2000 milliseconds (2 seconds)
+    console.log("After sleep");
+}
+
+
 async function convertHtmlToPng(htmlFilePath, pdfFilePath) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -16,12 +27,12 @@ async function convertHtmlToPng(htmlFilePath, pdfFilePath) {
     // wait for the selector appear on the page
     await page.screenshot({
         "type": "png", // can also be "jpeg" or "webp" (recommended)
-        "path": "../out/" + pdfFilePath,  // where to save it
+        "path": pdfFilePath,  // where to save it
         "fullPage": true,  // will scroll down to capture everything if true
     });
 
     await browser.close();
-    console.log('PDF generated: ../out/ ' + pdfFilePath);
+    console.log('png generated: ' + pdfFilePath);
 }
 
 function cropImage(inputPath, outputPath) {
@@ -69,27 +80,51 @@ async function convertPngToPdf(pngPath, pdfPath) {
     await browser.close();
 }
 
+async function processFilesSequentially() {
+    let dirPath = "../"
 
-// Count signatures and get the name without extension
-let filenames = Array.from(fs.readdirSync(dirPath + "certs/")).map(filename => {
-    let parsed = path.parse(filename);
-    return parsed.name;
-});
+    // Count signatures and get the name without extension
+    let filenames = Array.from(fs.readdirSync(dirPath + "certs/")).map(filename => {
+        let parsed = path.parse(filename);
+        return parsed.name;
+    });
 
-// Build certificates
-for (let i = 0; i < filenames.length; i++)
-{
-    if (filenames.at(i).includes(".gitignore"))
-    {
-        continue;
+    for (let i = 0; i < filenames.length; i++) {
+        if (filenames.at(i).includes(".gitignore")) {
+            console.log("igorint gitignore")
+            continue;
+        }
+
+        if (filenames.at(i).includes("template_files")) {
+            console.log("igorint template")
+            continue;
+        }
+
+        console.log("process" + filenames.at(i))
+
+        try {
+            const inputPath = '../certs/' + filenames.at(i) + '.html';
+            const pngPath = '../pngs/' + filenames.at(i) + '.png';
+            const croppedPngPath = '../pngs_cropped/' + filenames.at(i) + '.png';
+            const pdfPath = '../pdfs/' + filenames.at(i) + '.pdf';
+
+            // Convert HTML to PNG
+            await convertHtmlToPng(inputPath, pngPath);
+            console.log("Conversion from HTML to PNG for " + filenames.at(i) + " completed!");
+
+            // Crop the image
+            await cropImage(pngPath, croppedPngPath);
+
+            // Convert PNG to PDF
+            await convertPngToPdf(croppedPngPath, pdfPath);
+            console.log("PDF created successfully!");
+        } catch (error) {
+            console.error('Error processing file:', error);
+        }
     }
-    // Replace 'input.html' with your HTML file path and 'output.pdf' with desired PDF file path
-    convertHtmlToPng('../certs/' + filenames.at(i), '../pngs/' + filenames.at(i) + '.png' );
-
-    cropImage('../pngs/' + filenames.at(i) + '.png', '../pngs_cropped/' + filenames.at(i) + '.png')
-
-    convertPngToPdf('../pngs_cropped/' + filenames.at(i) + '.png', '../pdfs/' + filenames.at(i) + '.pdf')
-        .then(() => console.log('PDF created successfully!'))
-        .catch(error => console.error('Error creating PDF:', error));
 }
 
+
+
+// Call the async function
+processFilesSequentially();
