@@ -109,6 +109,9 @@ Since the workflow is only triggered
 when the signature is updated, you can add a meaningless change in the data file of the signature such as adding a
 whitespace or a line break to trigger the workflow and receive the signatures in your email.
 
+## Other notes
+The size of the certificate in the image output is 1400wx788h 
+
 ## Roadmap
 This project is completely functional! But there is still some space for improvements...
 - Convert workflows into a template that can be customized. This way we will reduce duplication since workflows are more 
