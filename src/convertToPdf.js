@@ -3,7 +3,7 @@ const path = require('path');
 const sharp = require('sharp');
 const fs = require('fs');
 
-async function convertHtmlToPdf(htmlFilePath, pdfFilePath) {
+async function convertHtmlToPng(htmlFilePath, pdfFilePath) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
 
@@ -22,6 +22,26 @@ async function convertHtmlToPdf(htmlFilePath, pdfFilePath) {
 
     await browser.close();
     console.log('PDF generated: ../out/ ' + pdfFilePath);
+}
+
+function cropImage(inputPath, outputPath) {
+    // Define the crop area
+    const cropOptions = {
+        left: 0,   // X offset
+        top: 0,    // Y offset
+        width: 1400,  // Width of the crop area
+        height: 788  // Height of the crop area
+    };
+
+    sharp(inputPath)
+        .extract(cropOptions)  // Crop the image
+        .toFile(outputPath)    // Save the cropped image
+        .then(() => {
+            console.log('Image cropped and saved successfully!');
+        })
+        .catch(err => {
+            console.error('Error cropping the image:', err);
+        });
 }
 
 async function convertPngToPdf(pngPath, pdfPath) {
@@ -49,34 +69,27 @@ async function convertPngToPdf(pngPath, pdfPath) {
     await browser.close();
 }
 
-// Replace 'input.html' with your HTML file path and 'output.pdf' with desired PDF file path
-convertHtmlToPdf('../templates/template.html', 'output.png');
 
+// Count signatures and get the name without extension
+let filenames = Array.from(fs.readdirSync(dirPath + "certs/")).map(filename => {
+    let parsed = path.parse(filename);
+    return parsed.name;
+});
 
-// Path to the original image
-const inputPath = "../out/" + "output.png";
-// Path to save the cropped image
-const outputPath = "../out/" + "output_cropped.png";
+// Build certificates
+for (let i = 0; i < filenames.length; i++)
+{
+    if (filenames.at(i).includes(".gitignore"))
+    {
+        continue;
+    }
+    // Replace 'input.html' with your HTML file path and 'output.pdf' with desired PDF file path
+    convertHtmlToPng('../certs/' + filenames.at(i), '../pngs/' + filenames.at(i) + '.png' );
 
-// Define the crop area
-const cropOptions = {
-    left: 0,   // X offset
-    top: 0,    // Y offset
-    width: 1400,  // Width of the crop area
-    height: 788  // Height of the crop area
-};
+    cropImage('../pngs/' + filenames.at(i) + '.png', '../pngs_cropped/' + filenames.at(i) + '.png')
 
-sharp(inputPath)
-    .extract(cropOptions)  // Crop the image
-    .toFile(outputPath)    // Save the cropped image
-    .then(() => {
-        console.log('Image cropped and saved successfully!');
-    })
-    .catch(err => {
-        console.error('Error cropping the image:', err);
-    });
+    convertPngToPdf('../pngs_cropped/' + filenames.at(i) + '.png', '../pdfs/' + filenames.at(i) + '.pdf')
+        .then(() => console.log('PDF created successfully!'))
+        .catch(error => console.error('Error creating PDF:', error));
+}
 
-// Example usage:
-convertPngToPdf('../out/output_cropped.png', '../out/output.pdf')
-    .then(() => console.log('PDF created successfully!'))
-    .catch(error => console.error('Error creating PDF:', error));

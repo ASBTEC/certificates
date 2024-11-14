@@ -25,10 +25,7 @@ EOF
     )
 
     # Save the JSON content to a file with a correlative number
-    echo "$JSON_CONTENT" > "${OUTPUT_FOLDER}/${counter}.json"
-
-    # Increment the counter
-    counter=$((counter + 1))
+    echo "$JSON_CONTENT" > "${OUTPUT_FOLDER}/${EMAIL/@/_at_}.json"
   done < "$INPUT_FILE"
 
   echo "JSON files generated successfully in $OUTPUT_FOLDER."
