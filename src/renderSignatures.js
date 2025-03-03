@@ -24,7 +24,7 @@ function buildSignature(template, name)
 }
 
 // Read text template and compile it
-let templateText = fs.readFileSync(dirPath + "templates/template.html", "utf8");
+let templateText = fs.readFileSync(dirPath + "templates/students_no_mark.html", "utf8");
 const template = Handlebars.compile(templateText);
 
 // Count signatures and get the name without extension
