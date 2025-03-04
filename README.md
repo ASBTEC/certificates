@@ -2,6 +2,13 @@
 Contains the necessary data and code to generate the email signature of the managed employees in EHS.
 
 ## Components
+###### Google Sheets and Google Drive API clients
+```shell
+python3 -m venv venv
+./venv/bin/pip3.8 install -r requirements.txt
+./venv/bin/python3 src/readSheet.py
+```
+
 ###### Bulk update of secrets
 We use `gh` CLI utility to read from a secret file that creates all of our organization secrets in bulk.
 
