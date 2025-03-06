@@ -91,16 +91,16 @@ async function processFilesSequentially() {
 
     for (let i = 0; i < filenames.length; i++) {
         if (filenames.at(i).includes(".gitignore")) {
-            console.log("igorint gitignore")
+            console.log("ignoring gitignore")
             continue;
         }
 
         if (filenames.at(i).includes("template_files")) {
-            console.log("igorint template")
+            console.log("ignoring template")
             continue;
         }
 
-        console.log("process" + filenames.at(i))
+        console.log("Processing " + filenames.at(i))
 
         try {
             const inputPath = '../certs/' + filenames.at(i) + '.html';
@@ -114,6 +114,7 @@ async function processFilesSequentially() {
 
             // Crop the image
             await cropImage(pngPath, croppedPngPath);
+            console.log("Image cropped: " + filenames.at(i))
 
             // Convert PNG to PDF
             await convertPngToPdf(croppedPngPath, pdfPath);

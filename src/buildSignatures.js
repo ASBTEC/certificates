@@ -9,12 +9,7 @@ const path = require('path');
 
 
 let dirPath;
-if (process.env.GH_ACTIONS_ENV) {
-    dirPath = "./"
-}
-else {
-    dirPath = "../"
-}
+dirPath = "../"
 
 function buildSignature(template, name)
 {

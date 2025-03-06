@@ -6,7 +6,7 @@ Contains the necessary data and code to generate the email signature of the mana
 ```shell
 python3 -m venv venv
 ./venv/bin/pip3.8 install -r requirements.txt
-./venv/bin/python3 src/readSheet.py
+./venv/bin/python3 src/certificate-generator.py
 ```
 
 ###### Bulk update of secrets
@@ -61,7 +61,7 @@ cd email-signatures && npm install
 
 After that, to execute the script you can do: 
 ```shell
-node ./src/renderSignatures.js
+node ./src/buildSignatures.js
 ```
 
 The template renderer script is **dynamic**, which means that there is no need to change the code of the script to 
