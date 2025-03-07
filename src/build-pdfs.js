@@ -109,14 +109,17 @@ async function processFilesSequentially() {
             const pdfPath = '../pdfs/' + filenames.at(i) + '.pdf';
 
             // Convert HTML to PNG
+            console.log("* certificate-generator * Step 3: Building certificate png " + (i + 1) + " out of " + filenames.length);
             await convertHtmlToPng(inputPath, pngPath);
             console.log("Conversion from HTML to PNG for " + filenames.at(i) + " completed!");
 
             // Crop the image
+            console.log("* certificate-generator * Step 4: Building certificate png cropped " + (i + 1) + " out of " + filenames.length);
             await cropImage(pngPath, croppedPngPath);
             console.log("Image cropped: " + filenames.at(i))
 
             // Convert PNG to PDF
+            console.log("* certificate-generator * Step 5: Building certificate pdf " + (i + 1) + " out of " + filenames.length);
             await convertPngToPdf(croppedPngPath, pdfPath);
             console.log("PDF created successfully!");
         } catch (error) {

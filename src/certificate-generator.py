@@ -214,7 +214,7 @@ def copy_template_files():
         print(f"Error copying files: {e}")
 
 
-def upload_file_to_drive(service_account_info, file_path, folder_id, file_name=""):
+def upload_file_to_drive(service_account_info, file_path, folder_id, mime, file_name=""):
     """Uploads a file to a specified Google Drive folder using a service account."""
     service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
 
@@ -257,23 +257,30 @@ metadata_courses = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "c
 r = ROW_INI
 data_file_paths = {}
 for row_data in data.values():
+    print("* certificate-generator * Step 1: Parse row " + (r - ROW_INI + 1).__str__() + " out of " + data.values().__len__().__str__())
     course_metadata = metadata[get_id_course_from_id_cert(row_data[0])]
     cert_data = parse_certificate_data(r, row_data, course_metadata, metadata_university, metadata_courses)
     cert_data_json = json.dumps(cert_data)
     save_cert_data(cert_data_json)
     r += 1
 
-run_script("node", "buildSignatures.js", os.path.dirname(os.path.abspath(__file__)))
+run_script("node", "build-htmls.js", os.path.dirname(os.path.abspath(__file__)))
 copy_template_files()
-run_script("node", "convertToPdf.js", os.path.dirname(os.path.abspath(__file__)))
-
+run_script("node", "build-pdfs.js", os.path.dirname(os.path.abspath(__file__)))
+cert_num = 1
+cert_total = data.keys().__len__()
 for cert_id in data.keys():
     pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
     json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", cert_id + ".json")
     email = json.loads(open(json_path).read()).get("email")
-    upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_SENT_ID, cert_id + "_" + email + ".pdf")
-    upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_SENT_ID, cert_id + "_" + email + ".json")
-    run_script("bash", "sendEmails.sh", os.path.dirname(os.path.abspath(__file__)), [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__()])
+    #print("* certificate-generator * Step 6: Uploading certificate " + cert_num.__str__() + " out of " + cert_total.__str__())
+    #upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_SENT_ID, "application/pdf", cert_id + "_" + email + ".pdf")
+    #print("* certificate-generator * Step 7: Uploading json data " + cert_num.__str__() + " out of " + cert_total.__str__())
+    #upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_SENT_ID, "text/plain", cert_id + "_" + email + ".json")
+    print("* certificate-generator * Step 8: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
+    run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
+               [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
+                json.loads(open(json_path).read()).get("course_name")])
 
 
 

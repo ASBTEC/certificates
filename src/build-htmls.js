@@ -31,6 +31,8 @@ let filenames = Array.from(fs.readdirSync(dirPath + "data/")).map(filename => {
 // Build signatures
 for (let i = 0; i < filenames.length; i++)
 {
+    console.log("* certificate-generator * Step 2: Building certificate html " + (i + 1) + " out of " + filenames.length);
+
     if (filenames.at(i).includes(".gitignore"))
     {
         continue;

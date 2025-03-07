@@ -10,13 +10,15 @@ EMAIL_USERNAME=$1
 email_value=$2
 EMAIL_PASSWORD="$3"
 cert_id="$4"
+course_name="$5"
 
-def print_args():
+print_args()
 {
   echo "from: $EMAIL_USERNAME"
   echo "to: $email_value"
   echo "pass: **"
   echo "cert: $cert_id"
+  echo "course name: $course_name"
 }
 
 PROJECT_FOLDER="$(cd "$(dirname "$(realpath "$0")")/../" &>/dev/null && pwd)"
@@ -41,6 +43,6 @@ A
 ;type=text/plain" \
     -F "file=@${PROJECT_FOLDER}/pdfs/${cert_id}.pdf;type=text/html;encoder=base64" \
     -F '=)' \
-    -H "Subject: Actualització de signatures d'email" \
+    -H "Subject: Certificat de \"$course_name\" d'ASBTEC" \
     -H "From: Informàtica ASBTEC <informatica@asbtec.cat>" \
     -H "To: ${EMAIL_USERNAME} <${EMAIL_USERNAME}>"

@@ -61,7 +61,7 @@ cd email-signatures && npm install
 
 After that, to execute the script you can do: 
 ```shell
-node ./src/buildSignatures.js
+node ./src/build-htmls.js
 ```
 
 The template renderer script is **dynamic**, which means that there is no need to change the code of the script to 
