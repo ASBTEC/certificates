@@ -53,6 +53,7 @@ def build_google_service(service_account_info, scopes, service_name, version):
 
     return service
 
+
 def read_rows(service_account_info, spreadsheet_id, page, initial_row, end_row, initial_column, end_column):
     range_name = f"{page}!" + initial_column + initial_row.__str__() + ":" + end_column + end_row.__str__()
 
@@ -169,7 +170,9 @@ def save_cert_data(cert_data):
         print(f"Error processing cert_data: {e}")
 
 
-def run_script(binary, file_name, wd, args=[]):
+def run_script(binary, file_name, wd, args=None):
+    if args is None:
+        args = []
     try:
         print(f"Running {file_name} with {wd}")
 
@@ -214,7 +217,7 @@ def copy_template_files():
         print(f"Error copying files: {e}")
 
 
-def upload_file_to_drive(service_account_info, file_path, folder_id, mime, file_name=""):
+def upload_file_to_drive(service_account_info, file_path, folder_id, file_name=""):
     """Uploads a file to a specified Google Drive folder using a service account."""
     service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
 
@@ -231,9 +234,10 @@ def upload_file_to_drive(service_account_info, file_path, folder_id, mime, file_
     # Upload file
     media = MediaFileUpload(file_path, mimetype='*/*',
                             chunksize=1024 * 1024, resumable=True)
-    file = service.files().create(media_body=media, fields="id", supportsAllDrives=True, supportsTeamDrives=True).execute()
+    file = service.files().create(body=file_metadata, media_body=media, fields="id", supportsAllDrives=True, supportsTeamDrives=True).execute()
     print(f"File uploaded successfully! File ID: {file.get('id')}")
     return file.get("id")
+
 
 # Constants
 SERVICE_ACCOUNT_INFO = json.loads(read_secret("SERVICE_REGISTRY.json"))
@@ -267,20 +271,22 @@ for row_data in data.values():
 run_script("node", "build-htmls.js", os.path.dirname(os.path.abspath(__file__)))
 copy_template_files()
 run_script("node", "build-pdfs.js", os.path.dirname(os.path.abspath(__file__)))
+
 cert_num = 1
 cert_total = data.keys().__len__()
 for cert_id in data.keys():
-    pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
     json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", cert_id + ".json")
+    pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
     email = json.loads(open(json_path).read()).get("email")
-    #print("* certificate-generator * Step 6: Uploading certificate " + cert_num.__str__() + " out of " + cert_total.__str__())
-    #upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_SENT_ID, "application/pdf", cert_id + "_" + email + ".pdf")
-    #print("* certificate-generator * Step 7: Uploading json data " + cert_num.__str__() + " out of " + cert_total.__str__())
-    #upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_SENT_ID, "text/plain", cert_id + "_" + email + ".json")
     print("* certificate-generator * Step 8: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
     run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
                [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
                 json.loads(open(json_path).read()).get("course_name")])
+    print("* certificate-generator * Step 9: Upload JSON to registry" + cert_num.__str__() + " out of " + cert_total.__str__())
+    upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_SENT_ID, os.path.basename(json_path))
+    print("* certificate-generator * Step 10: Upload PDF to registry " + cert_num.__str__() + " out of " + cert_total.__str__())
+    upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_SENT_ID, os.path.basename(pdf_path))
+
 
 
 

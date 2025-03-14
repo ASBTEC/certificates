@@ -29,13 +29,14 @@ curl -v --url 'smtps://smtp.gmail.com:465' \
   --mail-from "${EMAIL_USERNAME}" \
   --mail-rcpt "${email_value}" \
   --mail-rcpt "${EMAIL_USERNAME}" \
+  --mail-rcpt "informatica@asbtec.cat" \
   --user "${EMAIL_USERNAME}:${EMAIL_PASSWORD}" \
   -F '=(;type=multipart/mixed' \
   -F "=Hola!
 
 Estàs rebent aquest correu perquè has rebut un certificat per part d'ASBTEC.
 
-Aquest missatge ha estat auto-generat. Per a qualsevol problema contacteu amb informatica@asbtec.cat.
+Aquest missatge ha estat auto-generat. Per a qualsevol problema contacteu amb secretaria@asbtec.cat.
 
 Fins aviat!
 
@@ -44,5 +45,5 @@ A
     -F "file=@${PROJECT_FOLDER}/pdfs/${cert_id}.pdf;type=text/html;encoder=base64" \
     -F '=)' \
     -H "Subject: Certificat de \"$course_name\" d'ASBTEC" \
-    -H "From: Informàtica ASBTEC <informatica@asbtec.cat>" \
+    -H "From: Secretaria ASBTEC <secretaria@asbtec.cat>" \
     -H "To: ${EMAIL_USERNAME} <${EMAIL_USERNAME}>"

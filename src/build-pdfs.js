@@ -56,8 +56,10 @@ function cropImage(inputPath, outputPath) {
 }
 
 async function convertPngToPdf(pngPath, pdfPath) {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({ headless: true });
+    console.log("Browser launched")
     const page = await browser.newPage();
+    console.log("Browser newpage")
 
     // Load the image file as data URI
     const imageData = fs.readFileSync(pngPath, 'base64');
@@ -69,14 +71,19 @@ async function convertPngToPdf(pngPath, pdfPath) {
     </body></html>`;
 
     await page.setContent(htmlContent);
+    console.log("set content")
     // Set viewport and PDF size to 1400x788
     await page.setViewport({ width: 1400, height: 788 });
+    console.log("set viewport")
+    //await page.waitForLoadState('load'); // Ensures full load
+    //console.log("page loaded")
     await page.pdf({
         path: pdfPath,
         width: '1400px',
         height: '788px',
         printBackground: true
     });
+    console.log("PDF created")
     await browser.close();
 }
 
@@ -87,19 +94,11 @@ async function processFilesSequentially() {
     let filenames = Array.from(fs.readdirSync(dirPath + "certs/")).map(filename => {
         let parsed = path.parse(filename);
         return parsed.name;
-    });
+    })
+    .filter(name => name !== '.gitignore' && name !== 'template_files');
+
 
     for (let i = 0; i < filenames.length; i++) {
-        if (filenames.at(i).includes(".gitignore")) {
-            console.log("ignoring gitignore")
-            continue;
-        }
-
-        if (filenames.at(i).includes("template_files")) {
-            console.log("ignoring template")
-            continue;
-        }
-
         console.log("Processing " + filenames.at(i))
 
         try {
