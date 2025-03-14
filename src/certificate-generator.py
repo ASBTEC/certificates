@@ -6,6 +6,7 @@ import shutil
 import sys
 import json
 import subprocess
+import time
 
 from googleapiclient.http import MediaFileUpload
 
@@ -193,10 +194,10 @@ def run_script(binary, file_name, wd, args=None):
 
         # Check for errors
         if process.returncode != 0:
-            print("Error running script:", process.stderr.read())
+            raise RuntimeError(f"Error running script with return code " + process.returncode.__str__() + " :" + process.stderr.read())
 
     except Exception as e:
-        print(f"Error executing script: {e}")
+        raise RuntimeError(f"Error executing script: {e}")
 
 
 def copy_template_files():
@@ -239,12 +240,43 @@ def upload_file_to_drive(service_account_info, file_path, folder_id, file_name="
     return file.get("id")
 
 
+# Function to move a file
+def move_file(service_account_info, file_id, new_folder_id, origin_folder_id):
+    service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
+
+    try:
+        # Get the current file's metadata
+        file = service.files().get(fileId=file_id, fields='id, parents', supportsAllDrives=True, supportsTeamDrives=True).execute()
+
+        previous_parents = ",".join(file.get('parents'))
+        print("preious parent is " + previous_parents)
+
+        # Move the file to the new folder by updating its parent
+        updated_file = service.files().update(
+            fileId=file_id,
+            addParents=new_folder_id,
+            removeParents=previous_parents,
+            fields='id, parents',
+            supportsAllDrives=True,
+            supportsTeamDrives=True
+        ).execute()
+
+        print(f"File moved to folder with ID: {new_folder_id}")
+    except HttpError as error:
+        print(f"An error occurred: {error}")
+
+
+def add_email_to_filename(filename, email):
+    parts = filename.split(".")
+    return parts[0] + "_" + email + "." + parts[1]
+
 # Constants
 SERVICE_ACCOUNT_INFO = json.loads(read_secret("SERVICE_REGISTRY.json"))
 SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
 PAGE_NAME = "certificates"
 ROW_INI, ROW_END = parse_range_arguments()
 PAGE_METADATA_NAME = "courses_implemented"
+FOLDER_CREATED_ID = read_secret("FOLDER_CREATED_ID.txt")
 FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")
 GMAIL_PASSWORD = read_secret("GMAIL_PASSWORD.txt")
@@ -264,7 +296,7 @@ for row_data in data.values():
     print("* certificate-generator * Step 1: Parse row " + (r - ROW_INI + 1).__str__() + " out of " + data.values().__len__().__str__())
     course_metadata = metadata[get_id_course_from_id_cert(row_data[0])]
     cert_data = parse_certificate_data(r, row_data, course_metadata, metadata_university, metadata_courses)
-    cert_data_json = json.dumps(cert_data)
+    cert_data_json = json.dumps(cert_data, indent=4)
     save_cert_data(cert_data_json)
     r += 1
 
@@ -278,14 +310,26 @@ for cert_id in data.keys():
     json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", cert_id + ".json")
     pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
     email = json.loads(open(json_path).read()).get("email")
-    print("* certificate-generator * Step 8: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
-    run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
-               [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
-                json.loads(open(json_path).read()).get("course_name")])
-    print("* certificate-generator * Step 9: Upload JSON to registry" + cert_num.__str__() + " out of " + cert_total.__str__())
-    upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_SENT_ID, os.path.basename(json_path))
-    print("* certificate-generator * Step 10: Upload PDF to registry " + cert_num.__str__() + " out of " + cert_total.__str__())
-    upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_SENT_ID, os.path.basename(pdf_path))
+
+    print("* certificate-generator * Step 8: Upload JSON to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
+    json_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(json_path), email))
+    print("* certificate-generator * Step 9: Upload PDF to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
+    pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(pdf_path), email))
+
+    print("* certificate-generator * Step 10: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
+    try:
+        run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
+                   [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
+                    json.loads(open(json_path).read()).get("course_name")])
+    except Exception:
+        print("Could not send PDF " + os.path.basename(pdf_path))
+
+    # Reaching this instruction implies that we have sent the PDF, so we can move from folder
+    print("* certificate-generator * Step 11: Move JSON from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
+    move_file(SERVICE_ACCOUNT_INFO, json_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
+    print("* certificate-generator * Step 12: Move PDF from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
+    move_file(SERVICE_ACCOUNT_INFO, pdf_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
+
 
 
 
