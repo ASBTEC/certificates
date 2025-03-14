@@ -161,8 +161,8 @@ def save_cert_data(cert_data):
         file_path = os.path.join("data", f"{id}.json")
 
         # Save the JSON data to the file
-        with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(cert_data_json, f)
+        with open(file_path, "w") as f:
+            f.write(json.dumps(cert_data_json, indent=4).encode('utf-8').decode('unicode_escape'))
 
         print(f"Saved certificate data to {file_path}")
         return file_path
@@ -296,7 +296,7 @@ for row_data in data.values():
     print("* certificate-generator * Step 1: Parse row " + (r - ROW_INI + 1).__str__() + " out of " + data.values().__len__().__str__())
     course_metadata = metadata[get_id_course_from_id_cert(row_data[0])]
     cert_data = parse_certificate_data(r, row_data, course_metadata, metadata_university, metadata_courses)
-    cert_data_json = json.dumps(cert_data, indent=4)
+    cert_data_json = json.dumps(cert_data)
     save_cert_data(cert_data_json)
     r += 1
 
@@ -329,15 +329,4 @@ for cert_id in data.keys():
     move_file(SERVICE_ACCOUNT_INFO, json_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
     print("* certificate-generator * Step 12: Move PDF from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     move_file(SERVICE_ACCOUNT_INFO, pdf_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
-
-
-
-
-
-
-
-
-
-
-
 
