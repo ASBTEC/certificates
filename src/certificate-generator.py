@@ -28,12 +28,16 @@ def parse_range_arguments():
         n2 = int(sys.argv[2])
         if n1 < 1 or n2 < 1:
             raise ValueError("Both numbers must be natural numbers (greater than 0).")
+
         n3 = 0
         # Swap arguments if n1 is bigger than n2
         if n1 > n2:
             n3 = n2
             n2 = n1
             n1 = n3
+
+        if n1 == 1:
+            raise ValueError("First row must not be included in parsing range.")
         return n1, n2
     except ValueError as e:
         raise ValueError(f"Invalid input: {e}")
@@ -297,7 +301,7 @@ def add_email_to_filename(filename, email):
 SERVICE_ACCOUNT_INFO = json.loads(read_secret("SERVICE_REGISTRY.json"))
 
 SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
-PAGE_NAME = "certificates"
+PAGE_NAME = "_certificate_history"
 PAGE_METADATA_NAME = "courses_implemented"
 
 FOLDER_CREATED_ID = read_secret("FOLDER_CREATED_ID.txt")
@@ -335,26 +339,27 @@ for cert_id in data.keys():
     json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", cert_id + ".json")
     pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
     email = json.loads(open(json_path).read()).get("email")
+    print("email: " + email)
 
     print("* certificate-generator * Step 8: Upload JSON to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     json_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(json_path), email))
     print("* certificate-generator * Step 9: Upload PDF to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(pdf_path), email))
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "G", json.loads(open(json_path).read()).get("row_number"), "yes")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "H", json.loads(open(json_path).read()).get("row_number"), "yes")
 
     print("* certificate-generator * Step 10: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
         run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
-                   [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
+                   [GMAIL_USERNAME, email, GMAIL_PASSWORD, cert_id.__str__(),
                     json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name")])
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
 
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "H", json.loads(open(json_path).read()).get("row_number"), "yes")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "I", json.loads(open(json_path).read()).get("row_number"), "yes")
 
     # Reaching this instruction implies that we have sent the PDF, so we can move from folder
     print("* certificate-generator * Step 11: Move JSON from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     move_file(SERVICE_ACCOUNT_INFO, json_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
     print("* certificate-generator * Step 12: Move PDF from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     move_file(SERVICE_ACCOUNT_INFO, pdf_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
-
+    cert_num+=1
