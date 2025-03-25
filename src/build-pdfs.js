@@ -41,7 +41,7 @@ function cropImage(inputPath, outputPath) {
         left: 0,   // X offset
         top: 0,    // Y offset
         width: 1400,  // Width of the crop area
-        height: 788  // Height of the crop area
+        height: 835  // Height of the crop area
     };
 
     sharp(inputPath)
@@ -73,14 +73,14 @@ async function convertPngToPdf(pngPath, pdfPath) {
     await page.setContent(htmlContent);
     console.log("set content")
     // Set viewport and PDF size to 1400x788
-    await page.setViewport({ width: 1400, height: 788 });
+    await page.setViewport({ width: 1400, height: 835 });
     console.log("set viewport")
     //await page.waitForLoadState('load'); // Ensures full load
     //console.log("page loaded")
     await page.pdf({
         path: pdfPath,
         width: '1400px',
-        height: '788px',
+        height: '835px',
         printBackground: true
     });
     console.log("PDF created")

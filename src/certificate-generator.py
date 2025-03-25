@@ -350,16 +350,17 @@ for cert_id in data.keys():
     print("* certificate-generator * Step 10: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
         run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
-                   [GMAIL_USERNAME, email, GMAIL_PASSWORD, cert_id.__str__(),
+                   [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
                     json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name")])
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
 
     write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "I", json.loads(open(json_path).read()).get("row_number"), "yes")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "K", json.loads(open(json_path).read()).get("row_number"), pdf_id)
 
     # Reaching this instruction implies that we have sent the PDF, so we can move from folder
     print("* certificate-generator * Step 11: Move JSON from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     move_file(SERVICE_ACCOUNT_INFO, json_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
     print("* certificate-generator * Step 12: Move PDF from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     move_file(SERVICE_ACCOUNT_INFO, pdf_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
-    cert_num+=1
+    cert_num += 1
