@@ -74,6 +74,30 @@ def read_rows(service_account_info, spreadsheet_id, page, initial_row, end_row, 
         raise HttpError(f"An error occurred while reading the range: {err}")
 
 
+def write_cell(service_account_info, spreadsheet_id, page, column, row, value):
+    cell = f"{column}{row}"
+    range_name = f"{page}!{cell}"
+
+    service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/spreadsheets"], "sheets",
+                                   "v4")
+
+    try:
+        sheet = service.spreadsheets()
+        body = {'values': [[value]]}  # Wrap in double list to match Sheets API format
+
+        result = sheet.values().update(
+            spreadsheetId=spreadsheet_id,
+            range=range_name,
+            valueInputOption="RAW",
+            body=body
+        ).execute()
+
+        return result
+
+    except HttpError as err:
+        raise HttpError(f"An error occurred while writing to the cell: {err}")
+
+
 # num_cert	name	dni	email	cert_type	mark	ready?	created?	sent?
 # Removes rows that do not follow rules for certificate generation
 def filter_data(data):
@@ -316,14 +340,17 @@ for cert_id in data.keys():
     json_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(json_path), email))
     print("* certificate-generator * Step 9: Upload PDF to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(pdf_path), email))
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "G", json.loads(open(json_path).read()).get("row_number"), "yes")
 
     print("* certificate-generator * Step 10: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
         run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
                    [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
-                    json.loads(open(json_path).read()).get("course_name")])
+                    json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name")])
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
+
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "H", json.loads(open(json_path).read()).get("row_number"), "yes")
 
     # Reaching this instruction implies that we have sent the PDF, so we can move from folder
     print("* certificate-generator * Step 11: Move JSON from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())

@@ -6,11 +6,12 @@
 # Arg3: App password
 # Arg4: cert_id
 
-EMAIL_USERNAME=$1
-email_value=$2
+EMAIL_USERNAME="$1"
+email_value="$2"
 EMAIL_PASSWORD="$3"
 cert_id="$4"
 course_name="$5"
+partner_name="$6"
 
 print_args()
 {
@@ -19,6 +20,7 @@ print_args()
   echo "pass: **"
   echo "cert: $cert_id"
   echo "course name: $course_name"
+  echo "Partner name: $partner_name"
 }
 
 PROJECT_FOLDER="$(cd "$(dirname "$(realpath "$0")")/../" &>/dev/null && pwd)"
@@ -32,18 +34,23 @@ curl -v --url 'smtps://smtp.gmail.com:465' \
   --mail-rcpt "informatica@asbtec.cat" \
   --user "${EMAIL_USERNAME}:${EMAIL_PASSWORD}" \
   -F '=(;type=multipart/mixed' \
-  -F "=Hola!
+  -F "=Benvolgut/da ${partner_name},
 
-Estàs rebent aquest correu perquè has rebut un certificat per part d'ASBTEC.
+Ens plau informar-te que has rebut el teu certificat de \"${course_name}\" per part d'ASBTEC.
 
-Aquest missatge ha estat auto-generat. Per a qualsevol problema contacteu amb secretaria@asbtec.cat.
+Volem agrair-te la teva participació i esperem que continuïs gaudint i formant part dels nostres actes, cursos i iniciatives. Junts, contribuïm a millorar la biotecnologia al territori.
+
+Aquest missatge ha estat generat automàticament. Per a qualsevol dubte o incidència, pots contactar-nos a secretaria@asbtec.cat.
 
 Fins aviat!
 
-A
+Atentament,
+ASBTEC
+
+
 ;type=text/plain" \
     -F "file=@${PROJECT_FOLDER}/pdfs/${cert_id}.pdf;type=text/html;encoder=base64" \
     -F '=)' \
-    -H "Subject: Certificat de \"$course_name\" d'ASBTEC" \
+    -H "Subject: Recepció del teu certificat d'ASBTEC" \
     -H "From: Secretaria ASBTEC <secretaria@asbtec.cat>" \
     -H "To: ${EMAIL_USERNAME} <${EMAIL_USERNAME}>"
