@@ -350,7 +350,7 @@ for cert_id in data.keys():
     print("* certificate-generator * Step 10: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
         run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
-                   [GMAIL_USERNAME, TEST_EMAIL, GMAIL_PASSWORD, cert_id.__str__(),
+                   [GMAIL_USERNAME, email, GMAIL_PASSWORD, cert_id.__str__(),
                     json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name")])
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
