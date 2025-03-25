@@ -9,12 +9,7 @@ const path = require('path');
 
 
 let dirPath;
-if (process.env.GH_ACTIONS_ENV) {
-    dirPath = "./"
-}
-else {
-    dirPath = "../"
-}
+dirPath = "../"
 
 function buildSignature(template, name)
 {
@@ -31,11 +26,14 @@ const template = Handlebars.compile(templateText);
 let filenames = Array.from(fs.readdirSync(dirPath + "data/")).map(filename => {
     let parsed = path.parse(filename);
     return parsed.name;
-});
+})
+.filter(name => name !== '.gitignore' && name !== 'template_files');
 
 // Build signatures
 for (let i = 0; i < filenames.length; i++)
 {
+    console.log("* certificate-generator * Step 2: Building certificate html " + (i + 1) + " out of " + filenames.length);
+
     if (filenames.at(i).includes(".gitignore"))
     {
         continue;
