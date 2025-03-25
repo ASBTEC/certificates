@@ -42,6 +42,8 @@ Volem agrair-te la teva participació i esperem que continuïs gaudint i formant
 
 Aquest missatge ha estat generat automàticament. Per a qualsevol dubte o incidència, pots contactar-nos a secretaria@asbtec.cat.
 
+Si has rebut més d'un correu d'aquest tipus, queda't amb l'últim mail que hagis rebut, doncs serà la versió més actualitzada. Pots borrar la resta.
+
 Fins aviat!
 
 Atentament,
