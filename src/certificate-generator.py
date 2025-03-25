@@ -6,7 +6,6 @@ import shutil
 import sys
 import json
 import subprocess
-import time
 
 from googleapiclient.http import MediaFileUpload
 
@@ -18,8 +17,7 @@ def read_secret(filename):
         with open(secrets_path, "r") as file:
             return file.read().strip()
     except FileNotFoundError:
-        print(f"Error: File {filename} not found ")
-        exit(1)
+        raise ValueError(f"Error: File {filename} not found")
 
 
 def parse_range_arguments():
@@ -270,17 +268,21 @@ def add_email_to_filename(filename, email):
     parts = filename.split(".")
     return parts[0] + "_" + email + "." + parts[1]
 
+
 # Constants
 SERVICE_ACCOUNT_INFO = json.loads(read_secret("SERVICE_REGISTRY.json"))
+
 SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
 PAGE_NAME = "certificates"
-ROW_INI, ROW_END = parse_range_arguments()
 PAGE_METADATA_NAME = "courses_implemented"
+
 FOLDER_CREATED_ID = read_secret("FOLDER_CREATED_ID.txt")
 FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")
 GMAIL_PASSWORD = read_secret("GMAIL_PASSWORD.txt")
 TEST_EMAIL = read_secret("TEST_EMAIL.txt")
+
+ROW_INI, ROW_END = parse_range_arguments()
 
 # Range end target. Empty rows are ignored
 METADATA_MAX_ROW = 40
@@ -301,7 +303,6 @@ for row_data in data.values():
     r += 1
 
 run_script("node", "build-htmls.js", os.path.dirname(os.path.abspath(__file__)))
-copy_template_files()
 run_script("node", "build-pdfs.js", os.path.dirname(os.path.abspath(__file__)))
 
 cert_num = 1
