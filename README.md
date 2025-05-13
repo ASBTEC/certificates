@@ -1,5 +1,7 @@
 # email-signatures
-Contains the necessary data and code to generate the email signature of the managed employees in EHS.
+Contains the necessary data and code to generate the email signature of the managed members of ASBTEC executive board.
+
+Chec
 
 ## Components
 ###### Google Sheets and Google Drive API clients
