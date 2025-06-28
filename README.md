@@ -1,5 +1,5 @@
 # email-signatures
-Contains the necessary data and code to generate the email signature of the managed employees in EHS.
+Contains the necessary data and code to generate the email signature of the managed members of ASBTEC executive board.
 
 ## Components
 ###### Google Sheets and Google Drive API clients
@@ -144,3 +144,4 @@ wkhtmltopdf --enable-local-file-access --margin-right 0 --margin-left 0 --margin
 bash tools/clean-artifacts.sh; npm use 18; python -m venv venv ;venv/bin/python3 src/certificate-generator.py
 
 bash tools/clean-artifacts.sh; nvm use 18; python3 -m venv venv; venv/bin/python3 src/certificate-generator.py 175 175
+
