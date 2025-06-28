@@ -138,3 +138,9 @@ perfectly.
 
 # some commands that I used in this fork
 wkhtmltopdf --enable-local-file-access --margin-right 0 --margin-left 0 --margin-bottom 0 --margin-top 0 --orientation Landscape --page-size A4 templates/certificate/raw_template.html mypage.pdf
+
+
+# usage
+bash tools/clean-artifacts.sh; npm use 18; python -m venv venv ;venv/bin/python3 src/certificate-generator.py
+
+bash tools/clean-artifacts.sh; nvm use 18; python3 -m venv venv; venv/bin/python3 src/certificate-generator.py 175 175
