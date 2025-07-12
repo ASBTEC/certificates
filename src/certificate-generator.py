@@ -345,7 +345,7 @@ for cert_id in data.keys():
     json_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(json_path), email))
     print("* certificate-generator * Step 9: Upload PDF to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(pdf_path), email))
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "H", json.loads(open(json_path).read()).get("row_number"), "yes")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "I", json.loads(open(json_path).read()).get("row_number"), "yes")
 
     print("* certificate-generator * Step 10: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
@@ -355,8 +355,9 @@ for cert_id in data.keys():
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
 
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "I", json.loads(open(json_path).read()).get("row_number"), "yes")
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "K", json.loads(open(json_path).read()).get("row_number"), pdf_id)
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "J", json.loads(open(json_path).read()).get("row_number"), "yes")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "K", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(pdf_id))}")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "L", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(json_id))}")
 
     # Reaching this instruction implies that we have sent the PDF, so we can move from folder
     print("* certificate-generator * Step 11: Move JSON from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
