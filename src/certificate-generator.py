@@ -356,8 +356,8 @@ for cert_id in data.keys():
         print("Could not send PDF " + os.path.basename(pdf_path))
 
     write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "J", json.loads(open(json_path).read()).get("row_number"), "yes")
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "K", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(pdf_id))}")
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "L", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(json_id))}")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "K", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(pdf_id)}")
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "L", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(json_id)}")
 
     # Reaching this instruction implies that we have sent the PDF, so we can move from folder
     print("* certificate-generator * Step 11: Move JSON from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
