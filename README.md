@@ -141,7 +141,7 @@ wkhtmltopdf --enable-local-file-access --margin-right 0 --margin-left 0 --margin
 
 
 # usage
-bash tools/clean-artifacts.sh; npm use 18; python -m venv venv ;venv/bin/python3 src/certificate-generator.py
+bash tools/clean-artifacts.sh; nvm use 18; python -m venv venv ;venv/bin/python3 src/certificate-generator.py
 
 bash tools/clean-artifacts.sh; nvm use 18; python3 -m venv venv; venv/bin/python3 src/certificate-generator.py 175 175
 

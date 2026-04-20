@@ -309,6 +309,7 @@ FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")
 GMAIL_PASSWORD = read_secret("GMAIL_PASSWORD.txt")
 TEST_EMAIL = read_secret("TEST_EMAIL.txt")
+GMAIL_FROM = read_secret("GMAIL_FROM.txt")
 
 ROW_INI, ROW_END = parse_range_arguments()
 
@@ -351,7 +352,7 @@ for cert_id in data.keys():
     try:
         run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
                    [GMAIL_USERNAME, email, GMAIL_PASSWORD, cert_id.__str__(),
-                    json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name")])
+                    json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name"), GMAIL_FROM])
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
 
