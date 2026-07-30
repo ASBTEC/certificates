@@ -147,6 +147,9 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
     elif d["cert_type"] == "PROFE":
         d["cert_type_text"] = "reconeixement"
         d["action_text"] = "haver impartit el"
+    elif d["cert_type"] == "ORGANITZADOR":
+        d["cert_type_text"] = "coordinació"
+        d["action_text"] = "haver organitzat el"
 
     d["course_name"] = metadata_courses[course_metadata[2]][1].encode('utf-8').decode('utf-8')
     d["university_code"] = metadata_university[course_metadata[1]][0].encode('utf-8').decode('utf-8')
@@ -339,8 +342,8 @@ cert_total = data.keys().__len__()
 for cert_id in data.keys():
     json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", cert_id + ".json")
     pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
-    email = json.loads(open(json_path).read()).get("email")
-    print("email: " + email)
+    email = json.loads(open(json_path).read()).get("email")  # Uncomment this to send it to the real destination (prod)
+    #email = "someone@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
 
     print("* certificate-generator * Step 8: Upload JSON to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     json_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(json_path), email))
