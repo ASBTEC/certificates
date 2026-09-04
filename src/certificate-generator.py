@@ -116,6 +116,7 @@ def filter_data(data):
 
 
 # ['id', 'university', 'course', 'year', 'repetition', 'date_begin', 'date_end', 'date_text', 'credits',
+# 'Additional_logo_suffix', 'event_type',
 # 'Material docent del curs', 'Carpeta Info Curs'],
 def build_dict(metadata):
     d = {}
@@ -160,6 +161,7 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
         d["credits"] = int(course_metadata[8])
 
     d["additional_logo_suffix_2"] = course_metadata[9].encode('utf-8').decode('utf-8')
+    d["event_type"] = course_metadata[10].encode('utf-8').decode('utf-8')
     d["row_number"] = row_number.__str__()
 
     if d["cert_type"] == "ALUMNE_NOTA":
