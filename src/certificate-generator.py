@@ -151,6 +151,9 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
     elif d["cert_type"] == "ORGANITZADOR":
         d["cert_type_text"] = "de coordinació"
         d["action_text"] = "haver organitzat el"
+    elif d["cert_type"] == "VOLUNTARI":
+        d["cert_type_text"] = "de voluntariat"
+        d["action_text"] = "haver participat en el"
 
     d["course_name"] = metadata_courses[course_metadata[2]][1].encode('utf-8').decode('utf-8')
     d["university_code"] = metadata_university[course_metadata[1]][0].encode('utf-8').decode('utf-8')
