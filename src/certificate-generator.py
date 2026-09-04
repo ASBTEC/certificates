@@ -143,13 +143,13 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
         d["mark"] = float(row_data[5])
 
     if d["cert_type"] == "ALUMNE_NOTA" or d["cert_type"] == "ALUMNE":
-        d["cert_type_text"] = "participació"
-        d["action_text"] = "la seva destacada participació al"
+        d["cert_type_text"] = "d'assistència"
+        d["action_text"] = "la seva assistència al"
     elif d["cert_type"] == "PROFE":
-        d["cert_type_text"] = "reconeixement"
+        d["cert_type_text"] = "de reconeixement"
         d["action_text"] = "haver impartit el"
     elif d["cert_type"] == "ORGANITZADOR":
-        d["cert_type_text"] = "coordinació"
+        d["cert_type_text"] = "de coordinació"
         d["action_text"] = "haver organitzat el"
 
     d["course_name"] = metadata_courses[course_metadata[2]][1].encode('utf-8').decode('utf-8')
