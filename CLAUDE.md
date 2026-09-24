@@ -21,7 +21,7 @@ Goal: each course in `courses_implemented` chooses the language of its certifica
 
 ### Spreadsheet contract
 
-- New column **L** (`language`) in the `courses_implemented` tab, right after `event_type` (K).
+- New column `language` in the `courses_implemented` tab (found by header name, see the dates plan below).
 - Accepted values: `ca` (Catalan), `es` (Spanish), `en` (English). Case-insensitive, surrounding spaces ignored.
 - Empty cell / missing column → `ca` (current behaviour, so existing courses keep working).
 - Any other value → the script fails with an explicit error before generating anything for that row.
@@ -50,3 +50,46 @@ Goal: each course in `courses_implemented` chooses the language of its certifica
 ### Out of scope
 
 - Signers' names are still hard-coded in the template.
+
+## Plan: dates built from days instead of `date_text`
+
+Goal: remove the free-text `date_text` column of `courses_implemented` and generate the date phrase of the certificate
+from the individual days of the course, in the language of the course.
+
+### Spreadsheet contract
+
+Row 1 of every tab is a header row. Columns are looked up **by header name**, so their order does not matter.
+
+- `courses_implemented`: `date_text` is deleted. Columns used: `id`, `university`, `course`, `credits`,
+  `Additional_logo_suffix`, `event_type`, `language`.
+- `dates_intermediate` (N to N course ↔ date): `course_id` (id of `courses_implemented`), `date_id`.
+- `dates`: `id`.
+- `days_intermediate` (N to N date ↔ day): `date_id`, `day_id`.
+- `days`: `id`, `date` (a single day, `DD/MM/YYYY`).
+
+Join: `courses_implemented.id → dates_intermediate.course_id → date_id → dates.id → days_intermediate.date_id →
+day_id → days.id → date`. The days of a course are deduplicated and sorted.
+
+### Date phrase
+
+Days are grouped by year and month, then written as a list per month, e.g.:
+
+- ca: `el dia 17 de febrer del 2025`, `els dies 17, 18, 19 i 20 de febrer del 2025`,
+  `els dies 28 i 29 de novembre i els dies 2 i 5 de desembre del 2024`
+  (`d'` before `abril`, `agost`, `octubre`).
+- es: `los días 28 y 29 de noviembre y los días 2 y 5 de diciembre de 2024`.
+- en: `on the 28th and 29th of November and the 2nd and 5th of December 2024` (ordinal days, `the` before later months).
+- Several years: each year closes its own group, e.g. `els dies 30 i 31 de desembre del 2024 i el dia 2 de gener del 2025`.
+
+The phrase is stored in the `text_date` field of the certificate JSON, so the template does not change.
+
+### Implementation steps
+
+1. `certificate-generator.py`: new `read_table()` that reads a whole tab and returns its rows as dicts keyed by header,
+   validating that the required headers exist and skipping empty rows. Use it for `courses_implemented` (replacing
+   positional indices in `parse_certificate_data`) and the four new tabs.
+2. `certificate-generator.py`: `build_course_days()` joins the four tabs into `{course_id: [sorted dates]}`, failing
+   with explicit errors on dangling ids or badly formatted dates. A course without days is an error.
+3. `translations.py`: per-language month names, conjunction, day prefixes and year format, plus `format_days(days,
+   language)` that builds the phrase.
+4. README: document the new tabs.

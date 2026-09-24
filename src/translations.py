@@ -21,6 +21,15 @@ TRANSLATIONS = {
         "university_preposition": "a la",
         "closing": ", i perquè així consti s’expedeix aquest certificat.",
         "signer_position": "Coordinador general del BAC",
+        "dates": {
+            "and": "i",
+            "day_prefix": ["el dia", "els dies"],
+            "next_day_prefix": ["el dia", "els dies"],
+            "ordinal_days": False,
+            "months": ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost",
+                       "de setembre", "d'octubre", "de novembre", "de desembre"],
+            "year": "del {year}",
+        },
     },
     "es": {
         "html_lang": "es-ES",
@@ -38,6 +47,15 @@ TRANSLATIONS = {
         "university_preposition": "en la",
         "closing": ", y para que así conste se expide el presente certificado.",
         "signer_position": "Coordinador general del BAC",
+        "dates": {
+            "and": "y",
+            "day_prefix": ["el día", "los días"],
+            "next_day_prefix": ["el día", "los días"],
+            "ordinal_days": False,
+            "months": ["de enero", "de febrero", "de marzo", "de abril", "de mayo", "de junio", "de julio",
+                       "de agosto", "de septiembre", "de octubre", "de noviembre", "de diciembre"],
+            "year": "de {year}",
+        },
     },
     "en": {
         "html_lang": "en-GB",
@@ -55,6 +73,15 @@ TRANSLATIONS = {
         "university_preposition": "at the",
         "closing": ", and for the record, this certificate is hereby issued.",
         "signer_position": "General Coordinator of the BAC",
+        "dates": {
+            "and": "and",
+            "day_prefix": ["on the", "on the"],
+            "next_day_prefix": ["the", "the"],
+            "ordinal_days": True,
+            "months": ["of January", "of February", "of March", "of April", "of May", "of June", "of July",
+                       "of August", "of September", "of October", "of November", "of December"],
+            "year": "{year}",
+        },
     },
 }
 
@@ -71,3 +98,46 @@ def normalize_language(code):
 
 def get_translation(code):
     return TRANSLATIONS[normalize_language(code)]
+
+
+# Joins items as "a, b and c" using the conjunction of the language.
+def join_list(items, conjunction):
+    if len(items) == 1:
+        return items[0]
+    return ", ".join(items[:-1]) + " " + conjunction + " " + items[-1]
+
+
+# English ordinal of a day of the month: 1st, 2nd, 3rd, 4th, 11th, 12th, 13th, 21st...
+def english_ordinal(day):
+    if 11 <= day % 100 <= 13:
+        return str(day) + "th"
+    return str(day) + {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+
+
+# Builds the date phrase of a certificate from its days (datetime.date), e.g.
+# "els dies 28 i 29 de novembre i els dies 2 i 5 de desembre del 2024".
+def format_days(days, code):
+    texts = get_translation(code)["dates"]
+    days = sorted(set(days))
+    if not days:
+        raise ValueError("Cannot build a date phrase without days")
+
+    # Group days by year and then by month, keeping chronological order
+    years = {}
+    for day in days:
+        years.setdefault(day.year, {}).setdefault(day.month, []).append(day.day)
+
+    year_parts = []
+    first_segment = True
+    for year, months in years.items():
+        month_parts = []
+        for month, month_days in months.items():
+            day_texts = [english_ordinal(d) if texts["ordinal_days"] else str(d) for d in month_days]
+            prefix = texts["day_prefix"] if first_segment else texts["next_day_prefix"]
+            segment = (prefix[0 if len(month_days) == 1 else 1] + " " + join_list(day_texts, texts["and"]) + " " +
+                       texts["months"][month - 1])
+            first_segment = False
+            month_parts.append(segment)
+        year_parts.append(join_list(month_parts, texts["and"]) + " " + texts["year"].format(year=year))
+
+    return join_list(year_parts, texts["and"])

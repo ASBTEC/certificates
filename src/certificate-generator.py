@@ -6,10 +6,11 @@ import shutil
 import sys
 import json
 import subprocess
+from datetime import datetime
 
 from googleapiclient.http import MediaFileUpload
 
-from translations import get_translation, normalize_language
+from translations import format_days, get_translation, normalize_language
 
 
 # Read file passed as argument from secrets/ folder and return its content as string.
@@ -80,6 +81,60 @@ def read_rows(service_account_info, spreadsheet_id, page, initial_row, end_row, 
         raise HttpError(f"An error occurred while reading the range: {err}")
 
 
+# Reads a whole tab and returns its rows as dicts keyed by the header row (row 1). Empty rows are skipped.
+def read_table(service_account_info, spreadsheet_id, page, required_columns):
+    service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/spreadsheets.readonly"], "sheets", "v4")
+
+    try:
+        values = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=page).execute().get('values', [])
+    except HttpError as err:
+        raise RuntimeError(f"An error occurred while reading the tab {page}: {err}")
+
+    if not values:
+        raise ValueError(f"No values found in tab {page}")
+
+    header = [column.strip() for column in values[0]]
+    missing = [column for column in required_columns if column not in header]
+    if missing:
+        raise ValueError(f"Tab {page} is missing the column(s) {missing}. Found columns: {header}")
+
+    rows = []
+    for row in values[1:]:
+        if not any(cell.strip() for cell in row):
+            continue
+        # The Sheets API omits trailing empty cells
+        rows.append({column: (row[i].strip() if i < len(row) else "") for i, column in enumerate(header)})
+    return rows
+
+
+# Joins dates_intermediate -> dates -> days_intermediate -> days and returns {course_id: [datetime.date, ...]}.
+def build_course_days(dates_intermediate, dates, days_intermediate, days):
+    date_ids = {row["id"] for row in dates}
+
+    day_by_id = {}
+    for row in days:
+        try:
+            day_by_id[row["id"]] = datetime.strptime(row["date"], "%d/%m/%Y").date()
+        except ValueError:
+            raise ValueError(f"Day {row['id']} has date \"{row['date']}\", expected format DD/MM/YYYY")
+
+    days_by_date = {}
+    for row in days_intermediate:
+        if row["date_id"] not in date_ids:
+            raise ValueError(f"days_intermediate references unknown date_id \"{row['date_id']}\"")
+        if row["day_id"] not in day_by_id:
+            raise ValueError(f"days_intermediate references unknown day_id \"{row['day_id']}\"")
+        days_by_date.setdefault(row["date_id"], set()).add(day_by_id[row["day_id"]])
+
+    course_days = {}
+    for row in dates_intermediate:
+        if row["date_id"] not in date_ids:
+            raise ValueError(f"dates_intermediate references unknown date_id \"{row['date_id']}\"")
+        course_days.setdefault(row["course_id"], set()).update(days_by_date.get(row["date_id"], set()))
+
+    return {course_id: sorted(course_day_set) for course_id, course_day_set in course_days.items()}
+
+
 def write_cell(service_account_info, spreadsheet_id, page, column, row, value):
     cell = f"{column}{row}"
     range_name = f"{page}!{cell}"
@@ -117,9 +172,6 @@ def filter_data(data):
     return filtered_data
 
 
-# ['id', 'university', 'course', 'year', 'repetition', 'date_begin', 'date_end', 'date_text', 'credits',
-# 'Additional_logo_suffix', 'event_type', 'language',
-# 'Material docent del curs', 'Carpeta Info Curs'],
 def build_dict(metadata):
     d = {}
     for row in metadata:
@@ -134,7 +186,7 @@ def get_id_course_from_id_cert(id_cert):
         raise ValueError("the id course could not have been computed from id cert \"" + id_cert + "\"")
 
 
-def parse_certificate_data(row_number, row_data, course_metadata, metadata_university, metadata_courses):
+def parse_certificate_data(row_number, row_data, course_metadata, metadata_university, metadata_courses, course_days):
     d = {}
     d["id"] = row_data[0]
     d["name"] = row_data[1].encode('utf-8').decode('utf-8')
@@ -144,25 +196,27 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
     if d["cert_type"] == "ALUMNE_NOTA":
         d["mark"] = float(row_data[5])
 
-    # The Sheets API omits trailing empty cells, so the language column may be missing
-    d["language"] = normalize_language(course_metadata[11] if len(course_metadata) > 11 else "")
+    d["language"] = normalize_language(course_metadata["language"])
     translation = get_translation(d["language"])
-    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text")}
+    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates")}
 
     if d["cert_type"] in translation["cert_types"]:
         d["cert_type_text"] = translation["cert_types"][d["cert_type"]]["title"]
         d["action_text"] = translation["cert_types"][d["cert_type"]]["action"]
 
-    d["course_name"] = metadata_courses[course_metadata[2]][1].encode('utf-8').decode('utf-8')
-    d["university_code"] = metadata_university[course_metadata[1]][0].encode('utf-8').decode('utf-8')
-    d["university_name"] = metadata_university[course_metadata[1]][1].encode('utf-8').decode('utf-8')
-    d["text_date"] = course_metadata[7].encode('utf-8').decode('utf-8')
+    d["course_name"] = metadata_courses[course_metadata["course"]][1].encode('utf-8').decode('utf-8')
+    d["university_code"] = metadata_university[course_metadata["university"]][0].encode('utf-8').decode('utf-8')
+    d["university_name"] = metadata_university[course_metadata["university"]][1].encode('utf-8').decode('utf-8')
+
+    if course_metadata["id"] not in course_days:
+        raise ValueError(f"Course {course_metadata['id']} has no days in dates_intermediate / days_intermediate")
+    d["text_date"] = format_days(course_days[course_metadata["id"]], d["language"])
 
     if d["cert_type"] == "ALUMNE_NOTA":
-        d["credits"] = int(course_metadata[8])
+        d["credits"] = int(course_metadata["credits"])
 
-    d["additional_logo_suffix_2"] = course_metadata[9].encode('utf-8').decode('utf-8')
-    d["event_type"] = course_metadata[10].encode('utf-8').decode('utf-8')
+    d["additional_logo_suffix_2"] = course_metadata["Additional_logo_suffix"].encode('utf-8').decode('utf-8')
+    d["event_type"] = course_metadata["event_type"].encode('utf-8').decode('utf-8')
     d["row_number"] = row_number.__str__()
 
     if d["cert_type"] == "ALUMNE_NOTA":
@@ -323,16 +377,23 @@ ROW_INI, ROW_END = parse_range_arguments()
 METADATA_MAX_ROW = 40
 
 data = build_dict(filter_data(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, ROW_INI, ROW_END, 'A', 'I')))
-metadata = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME, 2, METADATA_MAX_ROW, 'A', 'L'))
+metadata = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME,
+                                                 ["id", "university", "course", "credits", "Additional_logo_suffix",
+                                                  "event_type", "language"])}
 metadata_university = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "university", 2, METADATA_MAX_ROW, 'A', 'B'))
 metadata_courses = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "courses", 2, METADATA_MAX_ROW, 'A', 'B'))
+course_days = build_course_days(
+    read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "dates_intermediate", ["course_id", "date_id"]),
+    read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "dates", ["id"]),
+    read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "days_intermediate", ["date_id", "day_id"]),
+    read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "days", ["id", "date"]))
 
 r = ROW_INI
 data_file_paths = {}
 for row_data in data.values():
     print("* certificate-generator * Step 1: Parse row " + (r - ROW_INI + 1).__str__() + " out of " + data.values().__len__().__str__())
     course_metadata = metadata[get_id_course_from_id_cert(row_data[0])]
-    cert_data = parse_certificate_data(r, row_data, course_metadata, metadata_university, metadata_courses)
+    cert_data = parse_certificate_data(r, row_data, course_metadata, metadata_university, metadata_courses, course_days)
     cert_data_json = json.dumps(cert_data)
     save_cert_data(cert_data_json)
     r += 1
