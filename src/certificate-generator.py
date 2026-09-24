@@ -9,6 +9,8 @@ import subprocess
 
 from googleapiclient.http import MediaFileUpload
 
+from translations import get_translation, normalize_language
+
 
 # Read file passed as argument from secrets/ folder and return its content as string.
 def read_secret(filename):
@@ -116,7 +118,7 @@ def filter_data(data):
 
 
 # ['id', 'university', 'course', 'year', 'repetition', 'date_begin', 'date_end', 'date_text', 'credits',
-# 'Additional_logo_suffix', 'event_type',
+# 'Additional_logo_suffix', 'event_type', 'language',
 # 'Material docent del curs', 'Carpeta Info Curs'],
 def build_dict(metadata):
     d = {}
@@ -142,18 +144,14 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
     if d["cert_type"] == "ALUMNE_NOTA":
         d["mark"] = float(row_data[5])
 
-    if d["cert_type"] == "ALUMNE_NOTA" or d["cert_type"] == "ALUMNE":
-        d["cert_type_text"] = "d'assistència"
-        d["action_text"] = "la seva assistència al"
-    elif d["cert_type"] == "PROFE":
-        d["cert_type_text"] = "de reconeixement"
-        d["action_text"] = "haver impartit el"
-    elif d["cert_type"] == "ORGANITZADOR":
-        d["cert_type_text"] = "de coordinació"
-        d["action_text"] = "haver organitzat el"
-    elif d["cert_type"] == "VOLUNTARI":
-        d["cert_type_text"] = "de voluntariat"
-        d["action_text"] = "haver participat en el"
+    # The Sheets API omits trailing empty cells, so the language column may be missing
+    d["language"] = normalize_language(course_metadata[11] if len(course_metadata) > 11 else "")
+    translation = get_translation(d["language"])
+    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text")}
+
+    if d["cert_type"] in translation["cert_types"]:
+        d["cert_type_text"] = translation["cert_types"][d["cert_type"]]["title"]
+        d["action_text"] = translation["cert_types"][d["cert_type"]]["action"]
 
     d["course_name"] = metadata_courses[course_metadata[2]][1].encode('utf-8').decode('utf-8')
     d["university_code"] = metadata_university[course_metadata[1]][0].encode('utf-8').decode('utf-8')
@@ -168,8 +166,8 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
     d["row_number"] = row_number.__str__()
 
     if d["cert_type"] == "ALUMNE_NOTA":
-        d["student_nota_text"] = (", amb equivalència de " + d["credits"].__str__() + " crèdit(s) ECTS amb nota " +
-                                  d["mark"].__str__()) + ", acreditat per la " + d["university_name"]
+        d["student_nota_text"] = translation["student_nota_text"].format(credits=d["credits"], mark=d["mark"],
+                                                                         university_name=d["university_name"])
     elif d["cert_type"] == "PROFE" or d["cert_type"] == "ALUMNE":
         d["student_nota_text"] = ""
     return d
@@ -325,7 +323,7 @@ ROW_INI, ROW_END = parse_range_arguments()
 METADATA_MAX_ROW = 40
 
 data = build_dict(filter_data(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, ROW_INI, ROW_END, 'A', 'I')))
-metadata = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME, 2, METADATA_MAX_ROW, 'A', 'K'))
+metadata = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME, 2, METADATA_MAX_ROW, 'A', 'L'))
 metadata_university = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "university", 2, METADATA_MAX_ROW, 'A', 'B'))
 metadata_courses = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "courses", 2, METADATA_MAX_ROW, 'A', 'B'))
 
@@ -361,7 +359,8 @@ for cert_id in data.keys():
     try:
         run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
                    [GMAIL_USERNAME, email, GMAIL_PASSWORD, cert_id.__str__(),
-                    json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name"), GMAIL_FROM])
+                    json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name"), GMAIL_FROM,
+                    json.loads(open(json_path).read()).get("language")])
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
 

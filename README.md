@@ -43,6 +43,13 @@ signature.
 
 The template is designed to be used with [Handlebars](https://handlebarsjs.com/).
 
+###### Certificate language
+The language of the certificates of a course is set in column **L** (`language`) of the `courses_implemented` tab of 
+the spreadsheet. Accepted values are `ca` (Catalan), `es` (Spanish) and `en` (English). An empty cell defaults to `ca`; 
+any other value stops the generation with an error. The texts of each language are defined in `src/translations.py`, and the notification 
+email of each language in `src/send-emails.sh`. 
+The `date_text` column is free text, so it must be written in the language of the course.
+
 ###### Template render
 To render the template you need to execute the JavaScript file `renderSignatures.js` in the `src` folder of this 
 repository. You will need to install `npm` and `node`. This will vary in each operating system, but usually the best 
