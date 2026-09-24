@@ -20,7 +20,7 @@ TRANSLATIONS = {
         "organised_by": ", organitzat per ASBTEC",
         "university_preposition": "a la",
         "closing": ", i perquè així consti s’expedeix aquest certificat.",
-        "signer_position": "Coordinador general del BAC",
+        "signer_position": "Coordinador general del BAC Barcelona 2026",
         "dates": {
             "and": "i",
             "day_prefix": ["el dia", "els dies"],
@@ -46,7 +46,7 @@ TRANSLATIONS = {
         "organised_by": ", organizado por ASBTEC",
         "university_preposition": "en la",
         "closing": ", y para que así conste se expide el presente certificado.",
-        "signer_position": "Coordinador general del BAC",
+        "signer_position": "Coordinador general del BAC Barcelona 2026",
         "dates": {
             "and": "y",
             "day_prefix": ["el día", "los días"],
@@ -72,7 +72,7 @@ TRANSLATIONS = {
         "organised_by": ", organised by ASBTEC",
         "university_preposition": "at the",
         "closing": ", and for the record, this certificate is hereby issued.",
-        "signer_position": "General Coordinator of the BAC",
+        "signer_position": "General Coordinator of the BAC Barcelona 2026",
         "dates": {
             "and": "and",
             "day_prefix": ["on the", "on the"],
