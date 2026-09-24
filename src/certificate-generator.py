@@ -349,6 +349,7 @@ for cert_id in data.keys():
     pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
     email = json.loads(open(json_path).read()).get("email")  # Uncomment this to send it to the real destination (prod)
     #email = "someone@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
+    email = "certificats@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
 
     print("* certificate-generator * Step 8: Upload JSON to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
     json_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, json_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(json_path), email))

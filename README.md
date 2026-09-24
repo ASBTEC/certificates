@@ -144,5 +144,5 @@ wkhtmltopdf --enable-local-file-access --margin-right 0 --margin-left 0 --margin
 npx puppeteer browsers install chrome
 
 # usage
-bash tools/clean-artifacts.sh; nvm install 18; nvm use 18; python3 -m venv venv; venv/bin/pip install -r requirements.txt; venv/bin/python3 src/certificate-generator.py 175 175
+bash tools/clean-artifacts.sh; nvm install 18; nvm use 18; python3 -m venv venv; venv/bin/pip install -r requirements.txt; venv/bin/python3 src/certificate-generator.py 451 818
 
