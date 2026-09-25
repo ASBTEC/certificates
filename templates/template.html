@@ -5,7 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASBTEC Diploma</title>
-    <link rel="stylesheet" href="../template_files/style.css">
+    <!-- The rendered HTML lives in certs/: resolve relative file names against templates/. Absolute URLs are used as is -->
+    <base href="../templates/">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div id="root">
@@ -129,7 +131,7 @@
                                  style="transform:scale(1, 1);width:100%;height:100%;overflow:hidden;position:relative;">
                                 <div id="NUiD6q1aDTTODxlr"
                                      style="width: calc(121.70383324% * 1); height: calc(201.22526785% / 1); position: absolute; top: 50%; left: 50%; opacity: 1; animation: auto ease 0s 1 normal none running;">
-                                    <img src="../template_files/logo_ami.jpg" loading="lazy"
+                                    <img src="logo_ami.jpg" loading="lazy"
                                          style="width:100%;height:100%;display:block;object-fit:cover;object-position:52.83967858% 53.2939405%;transform:translate(-52.83967858%, -53.2939405%) rotate(0deg);" alt="">
                                 </div>
                             </div>
@@ -145,7 +147,7 @@
                                  style="transform:scale(1, 1);width:100%;height:100%;overflow:hidden;position:relative;">
                                 <div id="SdjPFzPrF08HpRt8"
                                      style="width: calc(100% * 1); height: calc(100% / 1); position: absolute; top: 50%; left: 50%; opacity: 1; animation: auto ease 0s 1 normal none running;">
-                                    <img src="../template_files/logo_febiotec.png" loading="lazy"
+                                    <img src="logo_febiotec.png" loading="lazy"
                                          style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 50%;transform:translate(-50%, -50%) rotate(0deg);" alt="">
                                 </div>
                             </div>
@@ -238,7 +240,7 @@
                                 <div id="V0GWQC5Y92aKgxLF"
                                      style="width: 100%; height: 100%; position: absolute; bottom: 0; left: 0; opacity: 1;">
                                     <!-- contain + bottom center: any signature image fits whole inside the slot -->
-                                    <img src="../template_files/{{signature1.image}}" loading="lazy"
+                                    <img src="{{signature1.image}}" loading="lazy"
                                          style="width:100%;height:100%;display:block;object-fit:contain;object-position:50% 100%;" alt="">
                                 </div>
                             </div>
@@ -254,8 +256,8 @@
                                  style="transform:scale(1, 1);width:100%;height:100%;overflow:hidden;position:relative;">
                                 <div id="mP6ZSxfIoDJfqemi"
                                      style="width: calc(100% * 1); height: calc(100% / 1); position: absolute; top: 50%; left: 50%; opacity: 1; animation: auto ease 0s 1 normal none running;">
-                                    <img src="../template_files/logo_{{university_code}}.png" loading="lazy"
-                                         srcset="../template_files/logo_{{university_code}}.png 377w, ../template_files/logo_{{university_code}}.png 565w"
+                                    <img src="logo_{{university_code}}.png" loading="lazy"
+                                         srcset="logo_{{university_code}}.png 377w, logo_{{university_code}}.png 565w"
                                          sizes="(max-width: 375px) 14.11292455vw, (min-width: 375.05px) and (max-width: 480px) 14.11292455vw, (min-width: 480.05px) and (max-width: 768px) 14.11292455vw, (min-width: 768.05px) and (max-width: 1024px) 14.11292455vw, (min-width: 1024.05px) 14.11292455vw"
                                          style="width:100%;height:100%;display:block;object-fit:cover;object-position:50% 50%;transform:translate(-50%, -50%) rotate(0deg);" alt="">
                                 </div>
@@ -273,7 +275,7 @@
                                 <div id="JEOjIglGaoz904Gj"
                                      style="width: 100%; height: 220%; position: absolute; bottom: 0; left: 0; opacity: 1; animation: auto ease 0s 1 normal none running;">
                                     <!-- contain + bottom center: any signature image fits whole inside the slot -->
-                                    <img src="../template_files/{{signature2.image}}" loading="lazy"
+                                    <img src="{{signature2.image}}" loading="lazy"
                                          style="width:100%;height:100%;display:block;object-fit:contain;object-position:50% 100%;" alt="">
                                 </div>
                             </div>
@@ -290,7 +292,7 @@
                                 <div id="QVW0OemOyckR7GUd"
                                      style="width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 1;">
                                     <!-- contain + center: any logo aspect ratio fits whole inside the slot -->
-                                    <img src="../template_files/{{additional_logo}}" loading="lazy"
+                                    <img src="{{additional_logo}}" loading="lazy"
                                          style="width:100%;height:100%;display:block;object-fit:contain;object-position:50% 50%;" alt="">
                                 </div>
                             </div>

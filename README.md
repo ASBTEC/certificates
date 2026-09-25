@@ -53,8 +53,9 @@ with `no` in either are skipped), and the script writes `commit_SHA_ID` (commit 
 is sent). `university` and `courses` use `id` and `name`.
 
 ###### Additional logo
-The `Additional_logo_suffix` column of `courses_implemented` holds the full file name of the logo shown at the bottom
-right of the certificate (e.g. `logo_bac.png`), which must exist in `template_files/`. Leave it empty to show no logo.
+The `additional_logo_file` column of `courses_implemented` holds the full file name of the logo shown at the bottom
+right of the certificate: a file name inside `templates/` (e.g. `logo_bac.png`) or a public image URL. It is used as
+is, without validation, so a wrong value renders an empty slot. Leave it empty to show no logo.
 
 ###### Certificate language
 The language of the certificates of a course is set in the `language` column of the `courses_implemented` tab of 
@@ -69,11 +70,12 @@ Each course in `courses_implemented` chooses its two signers with the columns `s
 - `id`: integer identifier.
 - `sign_as`: `SECRETARY`, `PRESIDENT` or `BAC_COORDINATOR_2026`. The position printed under the name is translated to
   the language of the course (texts in `src/translations.py`).
-- `signature_image`: full file name of the image inside `template_files/` (e.g. `signature_jacastro.png`). Use images
+- `signature_image`: file name of the image inside `templates/` (e.g. `signature_jacastro.png`) or a public image
+  URL, used as is without validation (a wrong value renders an empty slot). Use images
   cropped to the signature, without margins or watermarks: they are shown whole, centered at the bottom of the slot.
 - `name`: full name printed under the signature.
 
-Unknown ids, unknown `sign_as` values or missing image files stop the generation with an error.
+Unknown ids or unknown `sign_as` values stop the generation with an error.
 
 ###### Course dates
 The date phrase of the certificate (e.g. `els dies 28 i 29 de novembre i els dies 2 i 5 de desembre del 2024`) is built

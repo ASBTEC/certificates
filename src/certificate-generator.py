@@ -195,7 +195,8 @@ def get_id_course_from_id_cert(id_cert):
         raise ValueError("the id course could not have been computed from id cert \"" + id_cert + "\"")
 
 
-# Resolves a signature id of a course into the name, translated position and image of the signer.
+# Resolves a signature id of a course into the name, translated position and image of the signer. The image is used
+# as is as the image source in the template: a file name inside templates/ or a URL.
 def build_signature(signature_id, signatures, translation):
     if signature_id not in signatures:
         raise ValueError(f"Unknown signature id \"{signature_id}\" in courses_implemented")
@@ -203,23 +204,16 @@ def build_signature(signature_id, signatures, translation):
     if signature["sign_as"] not in translation["sign_as"]:
         raise ValueError(f"Signature {signature_id} has unknown sign_as \"{signature['sign_as']}\". "
                          f"Supported values: {', '.join(translation['sign_as'].keys())}")
-    image_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "template_files",
-                              signature["signature_image"])
-    if not os.path.isfile(image_path):
-        raise ValueError(f"Signature {signature_id} image \"{signature['signature_image']}\" not found in template_files")
     return {"name": signature["name"], "position": translation["sign_as"][signature["sign_as"]],
             "image": signature["signature_image"]}
 
 
-# Returns the file name of the additional logo of a course. An empty cell (or the legacy "-") renders the transparent
-# placeholder EMPTY_LOGO, so the slot looks empty.
+# Returns the additional logo of a course, used as is as the image source in the template: a file name inside
+# templates/ or a URL. An empty cell (or the legacy "-") renders the transparent placeholder EMPTY_LOGO.
 def get_additional_logo(course_metadata):
-    logo = course_metadata["Additional_logo_suffix"]
+    logo = course_metadata["additional_logo_file"]
     if logo in ("", "-"):
         return EMPTY_LOGO
-    logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "template_files", logo)
-    if not os.path.isfile(logo_path):
-        raise ValueError(f"Course {course_metadata['id']} additional logo \"{logo}\" not found in template_files")
     return logo
 
 
@@ -326,24 +320,6 @@ def run_script(binary, file_name, wd, args=None):
         raise RuntimeError(f"Error executing script: {e}")
 
 
-def copy_template_files():
-    try:
-        # Define source and destination paths
-        source = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "templates", "template_files")
-        destination = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "certs", "template_files")
-
-        # Ensure the destination directory exists
-        os.makedirs(destination, exist_ok=True)
-
-        # Copy the entire folder
-        shutil.copytree(source, destination, dirs_exist_ok=True)
-
-        print(f"Successfully copied '{source}' to '{destination}'")
-
-    except Exception as e:
-        print(f"Error copying files: {e}")
-
-
 def upload_file_to_drive(service_account_info, file_path, folder_id, file_name=""):
     """Uploads a file to a specified Google Drive folder using a service account."""
     service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
@@ -418,7 +394,7 @@ HISTORY_HEADER, certificate_rows = read_table_rows(SERVICE_ACCOUNT_INFO, SPREADS
 # Ignore rows of people that did not assist and rows not ready to be generated
 data = {row["id"]: row for row in certificate_rows if row["assisted"] != "no" and row["ready"] != "no"}
 metadata = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME,
-                                                 ["id", "university", "course", "credits", "Additional_logo_suffix",
+                                                 ["id", "university", "course", "credits", "additional_logo_file",
                                                   "event_type", "language", "signature1", "signature2"])}
 signatures = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "signatures",
                                                    ["id", "sign_as", "signature_image", "name"])}

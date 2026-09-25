@@ -95,7 +95,7 @@ async function processFilesSequentially() {
         let parsed = path.parse(filename);
         return parsed.name;
     })
-    .filter(name => name !== '.gitignore' && name !== 'template_files');
+    .filter(name => name !== '.gitignore');
 
 
     for (let i = 0; i < filenames.length; i++) {

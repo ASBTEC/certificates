@@ -27,7 +27,7 @@ let filenames = Array.from(fs.readdirSync(dirPath + "data/")).map(filename => {
     let parsed = path.parse(filename);
     return parsed.name;
 })
-.filter(name => name !== '.gitignore' && name !== 'template_files');
+.filter(name => name !== '.gitignore');
 
 // Build signatures
 for (let i = 0; i < filenames.length; i++)

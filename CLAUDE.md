@@ -61,7 +61,7 @@ from the individual days of the course, in the language of the course.
 Row 1 of every tab is a header row. Columns are looked up **by header name**, so their order does not matter.
 
 - `courses_implemented`: `date_text` is deleted. Columns used: `id`, `university`, `course`, `credits`,
-  `Additional_logo_suffix`, `event_type`, `language`.
+  `additional_logo_file`, `event_type`, `language`.
 - `dates_intermediate` (N to N course ↔ date): `course_id` (id of `courses_implemented`), `date_id`.
 - `dates`: `id`.
 - `days_intermediate` (N to N date ↔ day): `date_id`, `day_id`.
@@ -105,7 +105,8 @@ Goal: the two signers of a certificate come from the course, and their position 
 - `signatures`: `id`, `sign_as`, `signature_image`, `name` (found by header name).
   - `sign_as` enum: `SECRETARY` (secretary of ASBTEC), `PRESIDENT` (president of ASBTEC), `BAC_COORDINATOR_2026`
     (general coordinator of the BAC Barcelona 2026). Its text is translated per course language.
-  - `signature_image`: full file name inside `template_files/` (e.g. `signature_jacastro.png`).
+  - `signature_image`: file name inside `templates/` (e.g. `signature_jacastro.png`) or a URL, used as is without
+    validation.
   - `name`: full name printed under the signature.
 
 ### Implementation steps
@@ -113,7 +114,7 @@ Goal: the two signers of a certificate come from the course, and their position 
 1. `translations.py`: replace `signer_position` with a `sign_as` dict (enum → text) per language.
 2. `certificate-generator.py`: read the `signatures` tab with `read_table()`; in `parse_certificate_data` resolve
    `signature1`/`signature2` into `{name, position, image}` objects in the JSON. Fail with an explicit error on an
-   unknown signature id, unknown `sign_as` or a missing image file.
+   unknown signature id or unknown `sign_as`.
 3. `template.html`: use `{{signature1.*}}` / `{{signature2.*}}` for image, name and position. Both signature slots use
    `object-fit: contain` anchored at the bottom center, so any image fits without cropping.
 4. README: document the new columns and tab.
@@ -134,7 +135,9 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
 
 ## Plan: additional logo as a file name
 
-- `courses_implemented.Additional_logo_suffix` (header name kept) now holds the full file name of a logo inside
-  `template_files/` (e.g. `logo_bac.png`, `logo_hipra.jpg`), used as is by the template (`{{additional_logo}}`).
+- `courses_implemented.additional_logo_file` (renamed from `Additional_logo_suffix`) holds the full file name of a logo inside
+  `templates/` (e.g. `logo_bac.png`, `logo_hipra.jpg`) or a public image URL, used as is by the template
+  (`{{additional_logo}}`). No validation: a wrong value renders an empty slot.
 - Empty cell (or the legacy `-`) → `logo_-.png`, a transparent 1x1 placeholder, so the slot looks empty.
-- A file name that does not exist in `template_files/` stops the generation with an error.
+- Template assets (images, fonts, `style.css`) live in `templates/` next to `template.html`, which sets
+  `<base href="../templates/">` so the rendered HTML in `certs/` resolves bare file names there.
