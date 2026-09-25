@@ -337,7 +337,7 @@ def upload_file_to_drive(service_account_info, file_path, folder_id, file_name="
     # Upload file
     media = MediaFileUpload(file_path, mimetype='*/*',
                             chunksize=1024 * 1024, resumable=True)
-    file = service.files().create(body=file_metadata, media_body=media, fields="id", supportsAllDrives=True, supportsTeamDrives=True).execute()
+    file = service.files().create(body=file_metadata, media_body=media, fields="id", supportsAllDrives=True, supportsTeamDrives=True).execute(num_retries=GOOGLE_API_RETRIES)
     print(f"File uploaded successfully! File ID: {file.get('id')}")
     return file.get("id")
 
@@ -353,12 +353,12 @@ def get_or_create_folder(service_account_info, parent_folder_id, name, folder_ca
     query = (f"name = '{escaped_name}' and '{parent_folder_id}' in parents and "
              f"mimeType = 'application/vnd.google-apps.folder' and trashed = false")
     folders = service.files().list(q=query, fields="files(id, name)", supportsAllDrives=True,
-                                   includeItemsFromAllDrives=True).execute().get("files", [])
+                                   includeItemsFromAllDrives=True).execute(num_retries=GOOGLE_API_RETRIES).get("files", [])
     if folders:
         folder_id = folders[0]["id"]
     else:
         folder_metadata = {"name": name, "parents": [parent_folder_id], "mimeType": "application/vnd.google-apps.folder"}
-        folder_id = service.files().create(body=folder_metadata, fields="id", supportsAllDrives=True).execute().get("id")
+        folder_id = service.files().create(body=folder_metadata, fields="id", supportsAllDrives=True).execute(num_retries=GOOGLE_API_RETRIES).get("id")
         print(f"Created folder {name} with ID: {folder_id}")
 
     folder_cache[(parent_folder_id, name)] = folder_id
@@ -377,6 +377,10 @@ SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
 PAGE_NAME = "_certificate_history"
 PAGE_METADATA_NAME = "courses_implemented"
 EMPTY_LOGO = "logo_-.png"
+# Retries of Google Drive requests on rate limit (403 userRateLimitExceeded / rateLimitExceeded, 429) and server (5xx)
+# errors. The client library waits a random time between 0 and 2^n seconds before retry n (exponential backoff), so 8
+# retries wait up to ~8.5 minutes in total in the worst case.
+GOOGLE_API_RETRIES = 8
 
 FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")
