@@ -325,6 +325,11 @@ def run_script(binary, file_name, wd, args=None):
         raise RuntimeError(f"Error executing script: {e}")
 
 
+# Escapes a value to be used inside single quotes in a Google Drive search query.
+def escape_drive_query(value):
+    return value.replace("\\", "\\\\").replace("'", "\\'")
+
+
 def upload_file_to_drive(service_account_info, file_path, folder_id, file_name=""):
     """Uploads a file to a specified Google Drive folder using a service account."""
     service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
@@ -339,9 +344,23 @@ def upload_file_to_drive(service_account_info, file_path, folder_id, file_name="
         "parents": [folder_id]  # Upload to the specified folder
     }
 
-    # Upload file
     media = MediaFileUpload(file_path, mimetype='*/*',
                             chunksize=1024 * 1024, resumable=True)
+
+    # If a file with the same name already exists in the folder, overwrite its content. It keeps its id, so links to it
+    # stay valid, and Drive keeps the previous content in the file's version history
+    query = (f"name = '{escape_drive_query(file_name)}' and '{folder_id}' in parents and "
+             f"mimeType != 'application/vnd.google-apps.folder' and trashed = false")
+    existing_files = service.files().list(q=query, fields="files(id, name)", supportsAllDrives=True,
+                                          includeItemsFromAllDrives=True).execute(num_retries=GOOGLE_API_RETRIES).get("files", [])
+    if existing_files:
+        if len(existing_files) > 1:
+            print(f"Warning: {len(existing_files)} files named {file_name} found, overwriting {existing_files[0]['id']}")
+        file = service.files().update(fileId=existing_files[0]["id"], media_body=media, fields="id",
+                                      supportsAllDrives=True).execute(num_retries=GOOGLE_API_RETRIES)
+        print(f"File overwritten successfully! File ID: {file.get('id')}")
+        return file.get("id")
+
     file = service.files().create(body=file_metadata, media_body=media, fields="id", supportsAllDrives=True, supportsTeamDrives=True).execute(num_retries=GOOGLE_API_RETRIES)
     print(f"File uploaded successfully! File ID: {file.get('id')}")
     return file.get("id")
@@ -354,8 +373,7 @@ def get_or_create_folder(service_account_info, parent_folder_id, name, folder_ca
         return folder_cache[(parent_folder_id, name)]
 
     service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
-    escaped_name = name.replace("\\", "\\\\").replace("'", "\\'")
-    query = (f"name = '{escaped_name}' and '{parent_folder_id}' in parents and "
+    query = (f"name = '{escape_drive_query(name)}' and '{parent_folder_id}' in parents and "
              f"mimeType = 'application/vnd.google-apps.folder' and trashed = false")
     folders = service.files().list(q=query, fields="files(id, name)", supportsAllDrives=True,
                                    includeItemsFromAllDrives=True).execute(num_retries=GOOGLE_API_RETRIES).get("files", [])
