@@ -22,8 +22,8 @@ Goal: each course in `courses_implemented` chooses the language of its certifica
 ### Spreadsheet contract
 
 - New column `language` in the `courses_implemented` tab (found by header name, see the dates plan below).
-- Accepted values: `ca` (Catalan), `es` (Spanish), `en` (English). Case-insensitive, surrounding spaces ignored.
-- Empty cell / missing column → `ca` (current behaviour, so existing courses keep working).
+- Accepted values: `cat` (Catalan), `es` (Spanish), `en` (English). Case-insensitive, surrounding spaces ignored.
+- Empty cell / missing column → `cat` (current behaviour, so existing courses keep working).
 - Any other value → the script fails with an explicit error before generating anything for that row.
 - The date phrase is generated from the dates tabs in the course language (see the dates plan below).
 
@@ -32,7 +32,7 @@ Goal: each course in `courses_implemented` chooses the language of its certifica
 1. **`src/translations.py`** (new): a `TRANSLATIONS` dict keyed by language code holding every static text of the
    certificate: html `lang` attribute, "awarded to", ID label, per-`cert_type` title and action text, "organised by
    ASBTEC", preposition before the university, the credits/mark sentence, the closing sentence and the signers'
-   position. Plus a `DEFAULT_LANGUAGE = "ca"` and a `get_translation(code)` helper that normalises/validates the code.
+   position. Plus a `DEFAULT_LANGUAGE = "cat"` and a `get_translation(code)` helper that normalises/validates the code.
    - Avoid double quotes and backslashes in the strings: `save_cert_data` decodes the JSON with `unicode_escape`.
 2. **`src/certificate-generator.py`**:
    - Read `courses_implemented` up to column `L` instead of `K`.
@@ -42,8 +42,8 @@ Goal: each course in `courses_implemented` chooses the language of its certifica
      under an `i18n` object in the JSON.
 3. **`templates/template.html`**: replace every hard-coded Catalan text with Handlebars placeholders
    (`{{i18n.*}}`, `{{cert_type_text}}`, `{{action_text}}`), and set `<html lang="{{i18n.html_lang}}">`.
-4. **`src/send-emails.sh`**: takes the language as 8th argument (default `ca`) and selects the email subject and body
-   (ca/es/en) with a `case`; unknown languages exit with an error. `certificate-generator.py` passes the `language`
+4. **`src/send-emails.sh`**: takes the language as 8th argument (default `cat`) and selects the email subject and body
+   (cat/es/en) with a `case`; unknown languages exit with an error. `certificate-generator.py` passes the `language`
    field of the certificate JSON. Do not use semicolons in the bodies: `curl -F` parses them.
 5. Docs: document the new column in the README.
 
@@ -74,7 +74,7 @@ day_id → days.id → date`. The days of a course are deduplicated and sorted.
 
 Days are grouped by year and month, then written as a list per month, e.g.:
 
-- ca: `el dia 17 de febrer del 2025`, `els dies 17, 18, 19 i 20 de febrer del 2025`,
+- cat: `el dia 17 de febrer del 2025`, `els dies 17, 18, 19 i 20 de febrer del 2025`,
   `els dies 28 i 29 de novembre i els dies 2 i 5 de desembre del 2024`
   (`d'` before `abril`, `agost`, `octubre`).
 - es: `los días 28 y 29 de noviembre y los días 2 y 5 de diciembre de 2024`.

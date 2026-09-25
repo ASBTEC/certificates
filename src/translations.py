@@ -2,10 +2,10 @@
 # The language of a course is read from the "language" column of the courses_implemented tab.
 # Do not use double quotes or backslashes in these strings: the certificate JSON is decoded with unicode_escape.
 
-DEFAULT_LANGUAGE = "ca"
+DEFAULT_LANGUAGE = "cat"
 
 TRANSLATIONS = {
-    "ca": {
+    "cat": {
         "html_lang": "ca-ES",
         "cert_types": {
             "ALUMNE": {"title": "Certificat d'assistència", "action": "per la seva assistència al"},

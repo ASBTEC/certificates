@@ -8,7 +8,7 @@
 # Arg5: course name
 # Arg6: partner name
 # Arg7: from address
-# Arg8: language (ca, es, en). Defaults to ca
+# Arg8: language (cat, es, en). Defaults to cat
 
 EMAIL_USERNAME="$1"
 email_value="$2"
@@ -17,7 +17,7 @@ cert_id="$4"
 course_name="$5"
 partner_name="$6"
 GMAIL_FROM="$7"
-language="${8:-ca}"
+language="${8:-cat}"
 
 print_args()
 {
@@ -35,7 +35,7 @@ PROJECT_FOLDER="$(cd "$(dirname "$(realpath "$0")")/../" &>/dev/null && pwd)"
 
 # Email subject and body in the language of the course. Do not use semicolons in the body: curl -F parses them.
 case "${language}" in
-  ca)
+  cat)
     email_subject="Recepció del teu certificat d'ASBTEC"
     email_body="Benvolgut/da ${partner_name},
 
