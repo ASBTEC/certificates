@@ -208,10 +208,9 @@ def build_signature(signature_id, signatures, translation):
             "image": signature["signature_image"]}
 
 
-# Returns the additional logo of a course, used as is as the image source in the template: a file name inside
-# templates/ or a URL. An empty cell (or the legacy "-") renders the transparent placeholder EMPTY_LOGO.
-def get_additional_logo(course_metadata):
-    logo = course_metadata["additional_logo_file"]
+# Returns a logo cell value, used as is as the image source in the template: a file name inside templates/ or a URL.
+# An empty cell (or the legacy "-") renders the transparent placeholder EMPTY_LOGO.
+def get_logo_file(logo):
     if logo in ("", "-"):
         return EMPTY_LOGO
     return logo
@@ -240,6 +239,7 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
 
     d["course_name"] = metadata_courses[course_metadata["course"]]["name"]
     d["university_code"] = metadata_university[course_metadata["university"]]["id"]
+    d["university_logo"] = get_logo_file(metadata_university[course_metadata["university"]]["logo_file"])
     d["university_name"] = metadata_university[course_metadata["university"]]["name"]
 
     if course_metadata["id"] not in course_days:
@@ -249,7 +249,7 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
     if d["cert_type"] == "ALUMNE_NOTA":
         d["credits"] = int(course_metadata["credits"])
 
-    d["additional_logo"] = get_additional_logo(course_metadata)
+    d["additional_logo"] = get_logo_file(course_metadata["additional_logo_file"])
     d["event_type"] = course_metadata["event_type"]
     if d["event_type"] not in translation["event_types"]:
         raise ValueError(f"Course {course_metadata['id']} has unknown event_type \"{d['event_type']}\". "
@@ -407,7 +407,7 @@ metadata = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHE
                                                   "event_type", "language", "signature1", "signature2"])}
 signatures = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "signatures",
                                                    ["id", "sign_as", "signature_image", "name"])}
-metadata_university = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "university", ["id", "name"])}
+metadata_university = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "university", ["id", "name", "logo_file"])}
 metadata_courses = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "courses", ["id", "name"])}
 course_days = build_course_days(
     read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "dates_intermediate", ["course_id", "date_id"]),

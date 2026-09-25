@@ -50,7 +50,9 @@ be added or removed freely. Missing required columns stop the generation with an
 `_certificate_history` uses `id`, `name`, `email`, `NIF`, `cert_type`, `mark`, `assisted` and `ready` (rows
 with `no` in either are skipped), and the script writes `commit_SHA_ID` (commit of this repository used to render the certificate, with a
 `-dirty` suffix if there were uncommitted changes), `url_cert` (Drive link of the PDF) and `sent` (`yes` once the email
-is sent). `university` and `courses` use `id` and `name`.
+is sent). `courses` uses `id` and `name`. `university` uses `id`, `name` and
+`logo_file`: the university logo, a file name inside `templates/` (e.g. `logo_UAB.png`) or a public image URL, used as is
+without validation. Leave it empty to show no logo.
 
 ###### Event type
 The `event_type` column of `courses_implemented` is `COURSE` or `CONGRESS`. It is translated to the language of the

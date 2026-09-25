@@ -131,7 +131,7 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
   are skipped), `ready` (rows with `no` are skipped), `sent` (written `yes` after the email is sent), `url_cert` (Drive link of the PDF) and `commit_SHA_ID`
   (SHA of the commit that rendered the certificate, `-dirty` suffix if tracked files had uncommitted changes).
   `created` is no longer written and can be deleted.
-- `university` and `courses`: `id`, `name`.
+- `university`: `id`, `name`, `logo_file` (university logo: file name inside `templates/` or URL, used as is; empty → `logo_empty.png`). `courses`: `id`, `name`.
 
 ## Plan: additional logo as a file name
 
