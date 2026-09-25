@@ -117,3 +117,17 @@ Goal: the two signers of a certificate come from the course, and their position 
 3. `template.html`: use `{{signature1.*}}` / `{{signature2.*}}` for image, name and position. Both signature slots use
    `object-fit: contain` anchored at the bottom center, so any image fits without cropping.
 4. README: document the new columns and tab.
+
+## Plan: every column referenced by header name
+
+Goal: no code refers to a spreadsheet column by letter or position, so columns can be moved or removed (e.g. the
+`date_text` column of `courses_implemented`).
+
+- `read_table()` reads a whole tab by header; `read_table_rows()` reads row 1 plus the row range passed as arguments
+  (`_certificate_history`) and keeps each row's real spreadsheet row number. `column_letter()` turns a header name into
+  the letter used when writing.
+- `_certificate_history` columns used: `id`, `name`, `email`, `NIF`, `cert_type`, `mark`, `assisted` (rows with `no`
+  are skipped), `sent` (written `yes` after the email is sent), `url_cert` (Drive link of the PDF) and `commit_SHA_ID`
+  (SHA of the commit that rendered the certificate, `-dirty` suffix if tracked files had uncommitted changes).
+  `ready` is not read. `created` is no longer written and can be deleted.
+- `university` and `courses`: `id`, `name`.
