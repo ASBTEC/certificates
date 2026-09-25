@@ -342,30 +342,21 @@ def save_cert_data(cert_data):
 def run_script(binary, file_name, wd, args=None):
     if args is None:
         args = []
-    try:
-        print(f"Running {file_name} with {wd}")
+    print(f"Running {file_name} with {wd}")
 
-        # Path to the JavaScript file
-        js_file = os.path.join(wd, file_name)
+    # Path to the JavaScript file
+    js_file = os.path.join(wd, file_name)
 
-        # Run the Node.js script and stream the output in real-time
-        process = subprocess.Popen([binary, js_file] + args, cwd=wd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    # Run the script with stderr merged into stdout and stream the output in real time. Reading stdout and stderr one
+    # after the other hides the errors until the end and deadlocks when the unread stream fills the pipe buffer
+    process = subprocess.Popen([binary, js_file] + args, cwd=wd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               text=True)
+    for line in process.stdout:
+        print(line, end="", flush=True)
+    process.wait()
 
-        # Print output line by line
-        for line in process.stdout:
-            print(line, end="")
-        for line in process.stderr:
-            print(line, end="")
-
-        # Wait for the process to complete
-        process.wait()
-
-        # Check for errors
-        if process.returncode != 0:
-            raise RuntimeError(f"Error running script with return code " + process.returncode.__str__() + " :" + process.stderr.read())
-
-    except Exception as e:
-        raise RuntimeError(f"Error executing script: {e}")
+    if process.returncode != 0:
+        raise RuntimeError(f"{file_name} failed with return code {process.returncode}, see its output above")
 
 
 # Escapes a value to be used inside single quotes in a Google Drive search query.

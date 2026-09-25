@@ -16,22 +16,25 @@ async function exampleFunction() {
 
 async function convertHtmlToPng(htmlFilePath, pdfFilePath) {
     const browser = await puppeteer.launch();
-    const page = await browser.newPage();
+    // Close the browser even if rendering fails, so failed certificates do not leave Chrome processes behind
+    try {
+        const page = await browser.newPage();
 
-    await page.setViewport({ width: 3840, height: 2160 });  // Sets the size of the screen of the virtual browser
+        await page.setViewport({ width: 3840, height: 2160 });  // Sets the size of the screen of the virtual browser
 
-    // Load the HTML file into Puppeteer
-    const fileUrl = 'file://' + path.resolve(htmlFilePath);
-    await page.goto(fileUrl, { waitUntil: 'networkidle0' });
+        // Load the HTML file into Puppeteer
+        const fileUrl = 'file://' + path.resolve(htmlFilePath);
+        await page.goto(fileUrl, { waitUntil: 'networkidle0' });
 
-    // wait for the selector appear on the page
-    await page.screenshot({
-        "type": "png", // can also be "jpeg" or "webp" (recommended)
-        "path": pdfFilePath,  // where to save it
-        "fullPage": true,  // will scroll down to capture everything if true
-    });
-
-    await browser.close();
+        // wait for the selector appear on the page
+        await page.screenshot({
+            "type": "png", // can also be "jpeg" or "webp" (recommended)
+            "path": pdfFilePath,  // where to save it
+            "fullPage": true,  // will scroll down to capture everything if true
+        });
+    } finally {
+        await browser.close();
+    }
     console.log('png generated: ' + pdfFilePath);
 }
 
@@ -44,47 +47,48 @@ function cropImage(inputPath, outputPath) {
         height: 835  // Height of the crop area
     };
 
-    sharp(inputPath)
+    // Return the promise so the caller waits for the cropped file before converting it, and gets its errors
+    return sharp(inputPath)
         .extract(cropOptions)  // Crop the image
         .toFile(outputPath)    // Save the cropped image
         .then(() => {
             console.log('Image cropped and saved successfully!');
-        })
-        .catch(err => {
-            console.error('Error cropping the image:', err);
         });
 }
 
 async function convertPngToPdf(pngPath, pdfPath) {
     const browser = await puppeteer.launch({ headless: true });
     console.log("Browser launched")
-    const page = await browser.newPage();
-    console.log("Browser newpage")
+    try {
+        const page = await browser.newPage();
+        console.log("Browser newpage")
 
-    // Load the image file as data URI
-    const imageData = fs.readFileSync(pngPath, 'base64');
-    const imageURI = `data:image/png;base64,${imageData}`;
+        // Load the image file as data URI
+        const imageData = fs.readFileSync(pngPath, 'base64');
+        const imageURI = `data:image/png;base64,${imageData}`;
 
-    // Set HTML content with the image
-    const htmlContent = `<html><body style="margin:0;">
-    <img src="${imageURI}" style="width:100%;height:auto;">
-    </body></html>`;
+        // Set HTML content with the image
+        const htmlContent = `<html><body style="margin:0;">
+        <img src="${imageURI}" style="width:100%;height:auto;">
+        </body></html>`;
 
-    await page.setContent(htmlContent);
-    console.log("set content")
-    // Set viewport and PDF size to 1400x788
-    await page.setViewport({ width: 1400, height: 835 });
-    console.log("set viewport")
-    //await page.waitForLoadState('load'); // Ensures full load
-    //console.log("page loaded")
-    await page.pdf({
-        path: pdfPath,
-        width: '1400px',
-        height: '835px',
-        printBackground: true
-    });
-    console.log("PDF created")
-    await browser.close();
+        await page.setContent(htmlContent);
+        console.log("set content")
+        // Set viewport and PDF size to 1400x788
+        await page.setViewport({ width: 1400, height: 835 });
+        console.log("set viewport")
+        //await page.waitForLoadState('load'); // Ensures full load
+        //console.log("page loaded")
+        await page.pdf({
+            path: pdfPath,
+            width: '1400px',
+            height: '835px',
+            printBackground: true
+        });
+        console.log("PDF created")
+    } finally {
+        await browser.close();
+    }
 }
 
 async function processFilesSequentially() {
@@ -98,6 +102,7 @@ async function processFilesSequentially() {
     .filter(name => name !== '.gitignore');
 
 
+    let failed = [];
     for (let i = 0; i < filenames.length; i++) {
         console.log("Processing " + filenames.at(i))
 
@@ -122,12 +127,22 @@ async function processFilesSequentially() {
             await convertPngToPdf(croppedPngPath, pdfPath);
             console.log("PDF created successfully!");
         } catch (error) {
-            console.error('Error processing file:', error);
+            console.error('Error processing file ' + filenames.at(i) + ':', error);
+            failed.push(filenames.at(i));
         }
+    }
+
+    // A non-zero exit code stops certificate-generator.py before uploading or emailing incomplete results
+    if (failed.length > 0) {
+        console.error(failed.length + " of " + filenames.length + " certificates could not be rendered: " + failed.join(", "));
+        process.exitCode = 1;
     }
 }
 
 
 
 // Call the async function
-processFilesSequentially();
+processFilesSequentially().catch(error => {
+    console.error(error);
+    process.exitCode = 1;
+});

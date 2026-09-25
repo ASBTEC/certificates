@@ -179,3 +179,13 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
 - `format_organisers()` (`translations.py`) builds the `organised_by` field: translated prefix (`organised_by`:
   ", organitzat per" / ", organizado por" / ", organised by") + names joined with the language's list rule (`, ` and
   i / y / and; Spanish `y` → `e` before an i sound). The template writes `{{organised_by}}`.
+
+## Rendering robustness
+
+- `run_script()` merges stderr into stdout and streams it: reading stdout fully before stderr hid the Node errors until
+  the end and deadlocked once the unread stderr filled the 64 KB pipe buffer (render looked "blocked").
+- `build-pdfs.js` closes Chrome in `finally`, awaits `cropImage()` (it returns the sharp promise), prints each failure
+  with the certificate name and exits with code 1 if any certificate failed, so `certificate-generator.py` stops before
+  uploading or emailing.
+- Ubuntu's `kernel.apparmor_restrict_unprivileged_userns=1` can make Puppeteer's Chrome fail to launch ("No usable
+  sandbox") depending on how the terminal was started.
