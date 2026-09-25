@@ -131,3 +131,10 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
   (SHA of the commit that rendered the certificate, `-dirty` suffix if tracked files had uncommitted changes).
   `created` is no longer written and can be deleted.
 - `university` and `courses`: `id`, `name`.
+
+## Plan: additional logo as a file name
+
+- `courses_implemented.Additional_logo_suffix` (header name kept) now holds the full file name of a logo inside
+  `template_files/` (e.g. `logo_bac.png`, `logo_hipra.jpg`), used as is by the template (`{{additional_logo}}`).
+- Empty cell (or the legacy `-`) → `logo_-.png`, a transparent 1x1 placeholder, so the slot looks empty.
+- A file name that does not exist in `template_files/` stops the generation with an error.

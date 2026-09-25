@@ -211,6 +211,18 @@ def build_signature(signature_id, signatures, translation):
             "image": signature["signature_image"]}
 
 
+# Returns the file name of the additional logo of a course. An empty cell (or the legacy "-") renders the transparent
+# placeholder EMPTY_LOGO, so the slot looks empty.
+def get_additional_logo(course_metadata):
+    logo = course_metadata["Additional_logo_suffix"]
+    if logo in ("", "-"):
+        return EMPTY_LOGO
+    logo_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "template_files", logo)
+    if not os.path.isfile(logo_path):
+        raise ValueError(f"Course {course_metadata['id']} additional logo \"{logo}\" not found in template_files")
+    return logo
+
+
 def parse_certificate_data(certificate_row, course_metadata, metadata_university, metadata_courses, course_days,
                            signatures):
     d = {}
@@ -243,7 +255,7 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
     if d["cert_type"] == "ALUMNE_NOTA":
         d["credits"] = int(course_metadata["credits"])
 
-    d["additional_logo_suffix_2"] = course_metadata["Additional_logo_suffix"].encode('utf-8').decode('utf-8')
+    d["additional_logo"] = get_additional_logo(course_metadata)
     d["event_type"] = course_metadata["event_type"].encode('utf-8').decode('utf-8')
     d["row_number"] = certificate_row["row_number"].__str__()
 
@@ -388,6 +400,7 @@ SERVICE_ACCOUNT_INFO = json.loads(read_secret("SERVICE_REGISTRY.json"))
 SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
 PAGE_NAME = "_certificate_history"
 PAGE_METADATA_NAME = "courses_implemented"
+EMPTY_LOGO = "logo_-.png"
 
 FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")

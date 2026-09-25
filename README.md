@@ -52,6 +52,10 @@ with `no` in either are skipped), and the script writes `commit_SHA_ID` (commit 
 `-dirty` suffix if there were uncommitted changes), `url_cert` (Drive link of the PDF) and `sent` (`yes` once the email
 is sent). `university` and `courses` use `id` and `name`.
 
+###### Additional logo
+The `Additional_logo_suffix` column of `courses_implemented` holds the full file name of the logo shown at the bottom
+right of the certificate (e.g. `logo_bac.png`), which must exist in `template_files/`. Leave it empty to show no logo.
+
 ###### Certificate language
 The language of the certificates of a course is set in the `language` column of the `courses_implemented` tab of 
 the spreadsheet. Accepted values are `ca` (Catalan), `es` (Spanish) and `en` (English). An empty cell defaults to `ca`; 
