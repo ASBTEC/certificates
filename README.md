@@ -47,8 +47,8 @@ The template is designed to be used with [Handlebars](https://handlebarsjs.com/)
 All tabs are read by the header names in row 1, so columns can be reordered, and columns the script does not use can
 be added or removed freely. Missing required columns stop the generation with an error listing the columns found.
 
-`_certificate_history` uses `id`, `name`, `email`, `NIF`, `cert_type`, `mark` and `assisted` (rows with `no` are
-skipped), and the script writes `commit_SHA_ID` (commit of this repository used to render the certificate, with a
+`_certificate_history` uses `id`, `name`, `email`, `NIF`, `cert_type`, `mark`, `assisted` and `ready` (rows
+with `no` in either are skipped), and the script writes `commit_SHA_ID` (commit of this repository used to render the certificate, with a
 `-dirty` suffix if there were uncommitted changes), `url_cert` (Drive link of the PDF) and `sent` (`yes` once the email
 is sent). `university` and `courses` use `id` and `name`.
 

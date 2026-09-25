@@ -400,10 +400,10 @@ ROW_INI, ROW_END = parse_range_arguments()
 COMMIT_SHA = get_commit_sha()
 
 HISTORY_HEADER, certificate_rows = read_table_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, ROW_INI, ROW_END,
-                                                   ["id", "name", "email", "NIF", "cert_type", "mark", "assisted", "sent",
-                                                    "url_cert", "commit_SHA_ID"])
-# Ignore rows of people that did not assist
-data = {row["id"]: row for row in certificate_rows if row["assisted"] != "no"}
+                                                   ["id", "name", "email", "NIF", "cert_type", "mark", "assisted", "ready",
+                                                    "sent", "url_cert", "commit_SHA_ID"])
+# Ignore rows of people that did not assist and rows not ready to be generated
+data = {row["id"]: row for row in certificate_rows if row["assisted"] != "no" and row["ready"] != "no"}
 metadata = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME,
                                                  ["id", "university", "course", "credits", "Additional_logo_suffix",
                                                   "event_type", "language", "signature1", "signature2"])}

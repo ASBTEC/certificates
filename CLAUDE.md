@@ -25,7 +25,7 @@ Goal: each course in `courses_implemented` chooses the language of its certifica
 - Accepted values: `ca` (Catalan), `es` (Spanish), `en` (English). Case-insensitive, surrounding spaces ignored.
 - Empty cell / missing column → `ca` (current behaviour, so existing courses keep working).
 - Any other value → the script fails with an explicit error before generating anything for that row.
-- `text_date` (column H) is free text written per course, so it must already be written in the course language.
+- The date phrase is generated from the dates tabs in the course language (see the dates plan below).
 
 ### Implementation steps
 
@@ -127,7 +127,7 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
   (`_certificate_history`) and keeps each row's real spreadsheet row number. `column_letter()` turns a header name into
   the letter used when writing.
 - `_certificate_history` columns used: `id`, `name`, `email`, `NIF`, `cert_type`, `mark`, `assisted` (rows with `no`
-  are skipped), `sent` (written `yes` after the email is sent), `url_cert` (Drive link of the PDF) and `commit_SHA_ID`
+  are skipped), `ready` (rows with `no` are skipped), `sent` (written `yes` after the email is sent), `url_cert` (Drive link of the PDF) and `commit_SHA_ID`
   (SHA of the commit that rendered the certificate, `-dirty` suffix if tracked files had uncommitted changes).
-  `ready` is not read. `created` is no longer written and can be deleted.
+  `created` is no longer written and can be deleted.
 - `university` and `courses`: `id`, `name`.
