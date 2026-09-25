@@ -381,7 +381,7 @@ SERVICE_ACCOUNT_INFO = json.loads(read_secret("SERVICE_REGISTRY.json"))
 SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
 PAGE_NAME = "_certificate_history"
 PAGE_METADATA_NAME = "courses_implemented"
-EMPTY_LOGO = "logo_-.png"
+EMPTY_LOGO = "logo_empty.png"
 # Retries of Google Drive requests on rate limit (403 userRateLimitExceeded / rateLimitExceeded, 429) and server (5xx)
 # errors. The client library waits a random time between 0 and 2^n seconds before retry n (exponential backoff), so 8
 # retries wait up to ~8.5 minutes in total in the worst case.

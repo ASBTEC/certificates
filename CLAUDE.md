@@ -138,7 +138,7 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
 - `courses_implemented.additional_logo_file` (renamed from `Additional_logo_suffix`) holds the full file name of a logo inside
   `templates/` (e.g. `logo_bac.png`, `logo_hipra.jpg`) or a public image URL, used as is by the template
   (`{{additional_logo}}`). No validation: a wrong value renders an empty slot.
-- Empty cell (or the legacy `-`) → `logo_-.png`, a transparent 1x1 placeholder, so the slot looks empty.
+- Empty cell (or the legacy `-`) → `logo_empty.png`, a transparent 1x1 placeholder, so the slot looks empty.
 - Template assets (images, fonts, `style.css`) live in `templates/` next to `template.html`, which sets
   `<base href="../templates/">` so the rendered HTML in `certs/` resolves bare file names there.
 
