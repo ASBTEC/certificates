@@ -105,7 +105,7 @@ def read_table(service_account_info, spreadsheet_id, page, required_columns):
     service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/spreadsheets.readonly"], "sheets", "v4")
 
     try:
-        values = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=page).execute().get('values', [])
+        values = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=page).execute(num_retries=GOOGLE_API_RETRIES).get('values', [])
     except HttpError as err:
         raise RuntimeError(f"An error occurred while reading the tab {page}: {err}")
 
@@ -122,7 +122,7 @@ def read_table_rows(service_account_info, spreadsheet_id, page, first_row, last_
 
     try:
         value_ranges = service.spreadsheets().values().batchGet(
-            spreadsheetId=spreadsheet_id, ranges=[f"{page}!1:1", f"{page}!{first_row}:{last_row}"]).execute().get("valueRanges", [])
+            spreadsheetId=spreadsheet_id, ranges=[f"{page}!1:1", f"{page}!{first_row}:{last_row}"]).execute(num_retries=GOOGLE_API_RETRIES).get("valueRanges", [])
     except HttpError as err:
         raise RuntimeError(f"An error occurred while reading the tab {page}: {err}")
 
@@ -201,12 +201,12 @@ def write_cell(service_account_info, spreadsheet_id, page, column, row, value):
             range=range_name,
             valueInputOption="RAW",
             body=body
-        ).execute()
+        ).execute(num_retries=GOOGLE_API_RETRIES)
 
         return result
 
     except HttpError as err:
-        raise HttpError(f"An error occurred while writing to the cell: {err}")
+        raise RuntimeError(f"An error occurred while writing to the cell {range_name}: {err}")
 
 
 def get_id_course_from_id_cert(id_cert):
@@ -421,7 +421,7 @@ SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
 PAGE_NAME = "_certificate_history"
 PAGE_METADATA_NAME = "courses_implemented"
 EMPTY_LOGO = "logo_empty.png"
-# Retries of Google Drive requests on rate limit (403 userRateLimitExceeded / rateLimitExceeded, 429) and server (5xx)
+# Retries of Google Drive and spreadsheet requests on rate limit (403 userRateLimitExceeded / rateLimitExceeded, 429) and server (5xx)
 # errors. The client library waits a random time between 0 and 2^n seconds before retry n (exponential backoff), so 8
 # retries wait up to ~8.5 minutes in total in the worst case.
 GOOGLE_API_RETRIES = 8

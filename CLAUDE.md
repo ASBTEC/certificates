@@ -8,7 +8,7 @@ Generates ASBTEC course certificates:
    `university`, `courses` tabs) and writes one JSON per certificate into `data/`.
 2. `src/build-htmls.js` fills `templates/template.html` (Handlebars) with each JSON → `certs/<id>.html`.
 3. `src/build-pdfs.js` renders each HTML to PNG with Puppeteer, crops it and converts it to a single-page PDF in `pdfs/`.
-4. For each certificate the Python script uploads the PDF to Drive into a subfolder of the "sent" folder named after the course id (created if missing), writes its link in `url_cert`, tries to send the email (`src/send-emails.sh`) and, only if it was sent, writes "yes" in `sent`. The JSON stays local. Drive requests retry with exponential backoff on rate limit / server errors (`GOOGLE_API_RETRIES`). A PDF whose name already exists in the target folder overwrites that file (same id and link, previous content kept in the Drive version history).
+4. For each certificate the Python script uploads the PDF to Drive into a subfolder of the "sent" folder named after the course id (created if missing), writes its link in `url_cert`, tries to send the email (`src/send-emails.sh`) and, only if it was sent, writes "yes" in `sent`. The JSON stays local. All Google API requests (Drive and spreadsheet reads/writes) retry with exponential backoff on rate limit / server errors (`GOOGLE_API_RETRIES`). A PDF whose name already exists in the target folder overwrites that file (same id and link, previous content kept in the Drive version history).
 
 Do not run the software (it reads/writes the real spreadsheet, Drive and sends emails).
 
