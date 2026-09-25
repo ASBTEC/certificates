@@ -368,32 +368,6 @@ def get_or_create_folder(service_account_info, parent_folder_id, name, folder_ca
     return folder_id
 
 
-# Function to move a file
-def move_file(service_account_info, file_id, new_folder_id, origin_folder_id):
-    service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
-
-    try:
-        # Get the current file's metadata
-        file = service.files().get(fileId=file_id, fields='id, parents', supportsAllDrives=True, supportsTeamDrives=True).execute()
-
-        previous_parents = ",".join(file.get('parents'))
-        print("preious parent is " + previous_parents)
-
-        # Move the file to the new folder by updating its parent
-        updated_file = service.files().update(
-            fileId=file_id,
-            addParents=new_folder_id,
-            removeParents=previous_parents,
-            fields='id, parents',
-            supportsAllDrives=True,
-            supportsTeamDrives=True
-        ).execute()
-
-        print(f"File moved to folder with ID: {new_folder_id}")
-    except HttpError as error:
-        print(f"An error occurred: {error}")
-
-
 def add_email_to_filename(filename, email):
     parts = filename.split(".")
     return parts[0] + "_" + email + "." + parts[1]
@@ -406,7 +380,6 @@ SPREADSHEET_ID = read_secret("SPREADSHEET_ID.txt")
 PAGE_NAME = "_certificate_history"
 PAGE_METADATA_NAME = "courses_implemented"
 
-FOLDER_CREATED_ID = read_secret("FOLDER_CREATED_ID.txt")
 FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")
 GMAIL_PASSWORD = read_secret("GMAIL_PASSWORD.txt")
@@ -455,11 +428,12 @@ for cert_id in data.keys():
     #email = "someone@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
     email = "certificats@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
 
-    print("* certificate-generator * Step 8: Upload PDF to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
-    course_id = get_id_course_from_id_cert(cert_id)
-    course_created_folder_id = get_or_create_folder(SERVICE_ACCOUNT_INFO, FOLDER_CREATED_ID, course_id, folder_cache)
-    pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, course_created_folder_id, add_email_to_filename(os.path.basename(pdf_path), email))
     write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "I", json.loads(open(json_path).read()).get("row_number"), "yes")
+
+    print("* certificate-generator * Step 8: Upload PDF to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
+    course_sent_folder_id = get_or_create_folder(SERVICE_ACCOUNT_INFO, FOLDER_SENT_ID, get_id_course_from_id_cert(cert_id), folder_cache)
+    pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, course_sent_folder_id, add_email_to_filename(os.path.basename(pdf_path), email))
+    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "K", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(pdf_id)}")
 
     print("* certificate-generator * Step 9: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
@@ -469,12 +443,7 @@ for cert_id in data.keys():
                     json.loads(open(json_path).read()).get("language")])
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
+    else:
+        write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "J", json.loads(open(json_path).read()).get("row_number"), "yes")
 
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "J", json.loads(open(json_path).read()).get("row_number"), "yes")
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "K", json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(pdf_id)}")
-
-    # Reaching this instruction implies that we have sent the PDF, so we can move from folder
-    print("* certificate-generator * Step 10: Move PDF from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
-    course_sent_folder_id = get_or_create_folder(SERVICE_ACCOUNT_INFO, FOLDER_SENT_ID, course_id, folder_cache)
-    move_file(SERVICE_ACCOUNT_INFO, pdf_id, course_sent_folder_id, course_created_folder_id)
     cert_num += 1

@@ -8,7 +8,7 @@ Generates ASBTEC course certificates:
    `university`, `courses` tabs) and writes one JSON per certificate into `data/`.
 2. `src/build-htmls.js` fills `templates/template.html` (Handlebars) with each JSON → `certs/<id>.html`.
 3. `src/build-pdfs.js` renders each HTML to PNG with Puppeteer, crops it and converts it to a single-page PDF in `pdfs/`.
-4. The Python script uploads the PDF to Drive into a subfolder named after the course id (created if missing, under both the "created" and "sent" folders; the JSON stays local), sends the email (`src/send-emails.sh`) and updates the spreadsheet.
+4. For each certificate the Python script uploads the PDF to Drive into a subfolder of the "sent" folder named after the course id (created if missing), writes its link in column K, tries to send the email (`src/send-emails.sh`) and, only if it was sent, writes "yes" in column J. The JSON stays local.
 
 Do not run the software (it reads/writes the real spreadsheet, Drive and sends emails).
 
