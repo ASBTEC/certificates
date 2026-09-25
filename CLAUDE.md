@@ -8,7 +8,7 @@ Generates ASBTEC course certificates:
    `university`, `courses` tabs) and writes one JSON per certificate into `data/`.
 2. `src/build-htmls.js` fills `templates/template.html` (Handlebars) with each JSON → `certs/<id>.html`.
 3. `src/build-pdfs.js` renders each HTML to PNG with Puppeteer, crops it and converts it to a single-page PDF in `pdfs/`.
-4. For each certificate the Python script uploads the PDF to Drive into a subfolder of the "sent" folder named after the course id (created if missing), writes its link in `url_cert`, tries to send the email (`src/send-emails.sh`) and, only if it was sent, writes "yes" in `sent`. The JSON stays local. All Google API requests (Drive and spreadsheet reads/writes) retry with exponential backoff on rate limit / server errors (`GOOGLE_API_RETRIES`). A PDF whose name already exists in the target folder overwrites that file (same id and link, previous content kept in the Drive version history).
+4. For each certificate the Python script uploads the PDF to Drive into a subfolder of the "sent" folder named after the course id (created if missing), writes its link in `url_cert`, tries to send the email (`src/mailer.py`) and, only if it was sent, writes "yes" in `sent`. The JSON stays local. All Google API requests (Drive and spreadsheet reads/writes) retry with exponential backoff on rate limit / server errors (`GOOGLE_API_RETRIES`). A PDF whose name already exists in the target folder overwrites that file (same id and link, previous content kept in the Drive version history).
 
 Do not run the software (it reads/writes the real spreadsheet, Drive and sends emails).
 
@@ -42,9 +42,8 @@ Goal: each course in `courses_implemented` chooses the language of its certifica
      under an `i18n` object in the JSON.
 3. **`templates/template.html`**: replace every hard-coded Catalan text with Handlebars placeholders
    (`{{i18n.*}}`, `{{cert_type_text}}`, `{{action_text}}`), and set `<html lang="{{i18n.html_lang}}">`.
-4. **`src/send-emails.sh`**: takes the language as 8th argument (default `cat`) and selects the email subject and body
-   (cat/es/en) with a `case`; unknown languages exit with an error. `certificate-generator.py` passes the `language`
-   field of the certificate JSON. Do not use semicolons in the bodies: `curl -F` parses them.
+4. **Email**: the subject and body of each language live in `translations.py` (`email_subject`, `email_body` with
+   `{partner_name}` and `{course_name}`); `mailer.py` builds the email in the language of the certificate.
 5. Docs: document the new column in the README.
 
 ### Out of scope
@@ -157,4 +156,16 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
 - `--test`: email sent to `secrets/TEST_EMAIL`. No Drive upload, nothing written to the spreadsheet.
 - `--production`: write `commit_SHA_ID`, upload to Drive, write `url_cert`, email the address in the spreadsheet,
   write `sent`. Asks for a typed `yes` confirmation (showing the certificate count and commit) unless `--force`.
-- `send-emails.sh` always adds `certificats@asbtec.cat` as a recipient.
+- `certificats@asbtec.cat` always receives a copy (`mailer.py`).
+
+## Email sending (`src/mailer.py`)
+
+- Python `smtplib` over SSL to `smtp.gmail.com:465`, replacing the former `send-emails.sh` + `curl`. One SMTP
+  connection and login for the whole run: one login per email made Gmail answer `454 4.7.0 Too many login attempts`.
+- Envelope sender `secrets/GMAIL_FROM.txt`; header `From: Certificats ASBTEC <certificats@asbtec.cat>`; header `To` with
+  the recipient's name; recipients = the mode's address + `certificats@asbtec.cat`. Plain-text body in the course
+  language, PDF attached as `application/pdf` named `<cert_id>.pdf`.
+- Temporary failures (SMTP 4xx, network errors, server disconnection) reconnect and retry with exponential backoff
+  (`EMAIL_RETRY_BASE_SECONDS * 2^n` + jitter, `EMAIL_RETRIES` times). SMTP 5xx (e.g. wrong password, unknown recipient)
+  is not retried. `EMAIL_DELAY_SECONDS` pause between emails.
+- Output of the old `send-emails.sh` (`curl -v`) printed the base64 app password: never paste old logs.

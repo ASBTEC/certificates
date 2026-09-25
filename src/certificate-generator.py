@@ -7,10 +7,12 @@ import shutil
 import sys
 import json
 import subprocess
+import time
 from datetime import datetime
 
 from googleapiclient.http import MediaFileUpload
 
+from mailer import Mailer, build_certificate_email
 from translations import format_days, get_translation, normalize_language
 
 
@@ -30,7 +32,7 @@ def read_secret(filename):
 #   --test:                 send the email to secrets/TEST_EMAIL. Nothing is uploaded or written to the spreadsheet.
 #   --dev / --develop:      send the email to secrets/DEV_EMAIL. Nothing is uploaded or written to the spreadsheet.
 #                           Default mode.
-# certificats@asbtec.cat is always added as a recipient by send-emails.sh.
+# certificats@asbtec.cat always receives a copy (see mailer.py).
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Generate ASBTEC certificates from the rows of _certificate_history.")
     parser.add_argument("first_row", type=int, help="first spreadsheet row to generate (2 or greater)")
@@ -250,7 +252,8 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
 
     d["language"] = normalize_language(course_metadata["language"])
     translation = get_translation(d["language"])
-    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates", "sign_as", "event_types")}
+    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates", "sign_as", "event_types",
+                                                             "email_subject", "email_body")}
     d["signature1"] = build_signature(course_metadata["signature1"], signatures, translation)
     d["signature2"] = build_signature(course_metadata["signature2"], signatures, translation)
 
@@ -425,6 +428,12 @@ EMPTY_LOGO = "logo_empty.png"
 # errors. The client library waits a random time between 0 and 2^n seconds before retry n (exponential backoff), so 8
 # retries wait up to ~8.5 minutes in total in the worst case.
 GOOGLE_API_RETRIES = 8
+# Email sending. All emails share one SMTP login (see mailer.py). Pause between emails, and retry temporary failures
+# waiting EMAIL_RETRY_BASE_SECONDS * 2^n (+ jitter) before retry n, i.e. ~30 s, 1, 2, 4 and 8 min (~16 min in total in
+# the worst case).
+EMAIL_DELAY_SECONDS = 2
+EMAIL_RETRIES = 5
+EMAIL_RETRY_BASE_SECONDS = 30
 
 FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")
@@ -473,6 +482,7 @@ run_script("node", "build-htmls.js", os.path.dirname(os.path.abspath(__file__)))
 run_script("node", "build-pdfs.js", os.path.dirname(os.path.abspath(__file__)))
 
 folder_cache = {}
+mailer = Mailer(GMAIL_USERNAME, GMAIL_PASSWORD, GMAIL_FROM, EMAIL_RETRIES, EMAIL_RETRY_BASE_SECONDS)
 cert_num = 1
 cert_total = data.keys().__len__()
 for cert_id in data.keys():
@@ -490,15 +500,19 @@ for cert_id in data.keys():
 
     print("* certificate-generator * Step 9: Send email to " + email + " " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
-        run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
-                   [GMAIL_USERNAME, email, GMAIL_PASSWORD, cert_id.__str__(),
-                    json.loads(open(json_path).read()).get("course_name"), json.loads(open(json_path).read()).get("name"), GMAIL_FROM,
-                    json.loads(open(json_path).read()).get("language")])
-    except Exception:
-        print("Could not send PDF " + os.path.basename(pdf_path))
+        mailer.send(build_certificate_email(email, json.loads(open(json_path).read()).get("name"),
+                                            json.loads(open(json_path).read()).get("course_name"),
+                                            json.loads(open(json_path).read()).get("language"), pdf_path), email)
+    except Exception as e:
+        print("Could not send PDF " + os.path.basename(pdf_path) + ": " + str(e))
     else:
         # Only production marks the certificate as sent to its recipient
         if MODE == "production":
             write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, column_letter(HISTORY_HEADER, "sent"), json.loads(open(json_path).read()).get("row_number"), "yes")
 
+    # Space out the SMTP logins
+    if cert_num < cert_total:
+        time.sleep(EMAIL_DELAY_SECONDS)
     cert_num += 1
+
+mailer.close()

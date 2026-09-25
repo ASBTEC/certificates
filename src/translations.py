@@ -20,6 +20,23 @@ TRANSLATIONS = {
         "organised_by": ", organitzat per ASBTEC",
         "university_preposition": "a la",
         "closing": ", i perquè així consti s’expedeix aquest certificat.",
+        "email_subject": "Recepció del teu certificat d'ASBTEC",
+        "email_body": (
+            "Benvolgut/da {partner_name},\n"
+            "\n"
+            "Ens plau informar-te que has rebut el teu certificat de \"{course_name}\" per part d'ASBTEC.\n"
+            "\n"
+            "Volem agrair-te la teva participació i esperem que continuïs gaudint i formant part dels nostres actes, cursos i iniciatives. Junts, contribuïm a millorar la biotecnologia al territori.\n"
+            "\n"
+            "Aquest missatge ha estat generat automàticament. Per a qualsevol dubte o incidència, pots contactar-nos a certificats@asbtec.cat.\n"
+            "\n"
+            "Si has rebut més d'un correu d'aquest tipus, queda't amb l'últim mail que hagis rebut, doncs serà la versió més actualitzada. Pots borrar la resta.\n"
+            "\n"
+            "Fins aviat!\n"
+            "\n"
+            "Atentament,\n"
+            "ASBTEC"
+        ),
         "event_types": {"COURSE": "curs", "CONGRESS": "congrés"},
         "sign_as": {
             "SECRETARY": "Secretari d'ASBTEC",
@@ -51,6 +68,23 @@ TRANSLATIONS = {
         "organised_by": ", organizado por ASBTEC",
         "university_preposition": "en la",
         "closing": ", y para que así conste se expide el presente certificado.",
+        "email_subject": "Recepción de tu certificado de ASBTEC",
+        "email_body": (
+            "Estimado/a {partner_name},\n"
+            "\n"
+            "Nos complace informarte de que has recibido tu certificado de \"{course_name}\" por parte de ASBTEC.\n"
+            "\n"
+            "Queremos agradecerte tu participación y esperamos que sigas disfrutando y formando parte de nuestros actos, cursos e iniciativas. Juntos, contribuimos a mejorar la biotecnología en el territorio.\n"
+            "\n"
+            "Este mensaje ha sido generado automáticamente. Para cualquier duda o incidencia, puedes contactarnos en certificats@asbtec.cat.\n"
+            "\n"
+            "Si has recibido más de un correo de este tipo, quédate con el último que hayas recibido, ya que será la versión más actualizada. Puedes borrar el resto.\n"
+            "\n"
+            "¡Hasta pronto!\n"
+            "\n"
+            "Atentamente,\n"
+            "ASBTEC"
+        ),
         "event_types": {"COURSE": "curso", "CONGRESS": "congreso"},
         "sign_as": {
             "SECRETARY": "Secretario de ASBTEC",
@@ -82,6 +116,23 @@ TRANSLATIONS = {
         "organised_by": ", organised by ASBTEC",
         "university_preposition": "at the",
         "closing": ", and for the record, this certificate is hereby issued.",
+        "email_subject": "Your ASBTEC certificate",
+        "email_body": (
+            "Dear {partner_name},\n"
+            "\n"
+            "We are pleased to inform you that you have received your certificate for \"{course_name}\" from ASBTEC.\n"
+            "\n"
+            "We would like to thank you for your participation and we hope you keep enjoying and taking part in our events, courses and initiatives. Together, we contribute to improving biotechnology in our region.\n"
+            "\n"
+            "This message has been generated automatically. For any questions or issues, you can contact us at certificats@asbtec.cat.\n"
+            "\n"
+            "If you have received more than one email of this kind, please keep the most recent one, as it is the most up-to-date version. You can delete the rest.\n"
+            "\n"
+            "See you soon!\n"
+            "\n"
+            "Kind regards,\n"
+            "ASBTEC"
+        ),
         "event_types": {"COURSE": "course", "CONGRESS": "congress"},
         "sign_as": {
             "SECRETARY": "Secretary of ASBTEC",

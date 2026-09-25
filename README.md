@@ -80,7 +80,7 @@ is, without validation, so a wrong value renders an empty slot. Leave it empty t
 The language of the certificates of a course is set in the `language` column of the `courses_implemented` tab of 
 the spreadsheet. Accepted values are `cat` (Catalan), `es` (Spanish) and `en` (English). An empty cell defaults to `cat`; 
 any other value stops the generation with an error. The texts of each language are defined in `src/translations.py`, and the notification 
-email of each language in `src/send-emails.sh`.
+email of each language (`email_subject`, `email_body`) too. Emails are sent by `src/mailer.py`.
 
 ###### Signatures
 Each course in `courses_implemented` chooses its two signers with the columns `signature1` (left) and `signature2`
