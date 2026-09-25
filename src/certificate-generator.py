@@ -181,7 +181,7 @@ def build_dict(metadata):
 
 def get_id_course_from_id_cert(id_cert):
     try:
-        return "-".join(row_data[0].split("-")[0:4])
+        return "-".join(id_cert.split("-")[0:4])
     except ValueError:
         raise ValueError("the id course could not have been computed from id cert \"" + id_cert + "\"")
 
@@ -345,6 +345,29 @@ def upload_file_to_drive(service_account_info, file_path, folder_id, file_name="
     return file.get("id")
 
 
+# Returns the id of the subfolder with the given name inside parent_folder_id, creating it if it does not exist.
+# Results are cached in folder_cache to avoid repeated API calls for certificates of the same course.
+def get_or_create_folder(service_account_info, parent_folder_id, name, folder_cache):
+    if (parent_folder_id, name) in folder_cache:
+        return folder_cache[(parent_folder_id, name)]
+
+    service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
+    escaped_name = name.replace("\\", "\\\\").replace("'", "\\'")
+    query = (f"name = '{escaped_name}' and '{parent_folder_id}' in parents and "
+             f"mimeType = 'application/vnd.google-apps.folder' and trashed = false")
+    folders = service.files().list(q=query, fields="files(id, name)", supportsAllDrives=True,
+                                   includeItemsFromAllDrives=True).execute().get("files", [])
+    if folders:
+        folder_id = folders[0]["id"]
+    else:
+        folder_metadata = {"name": name, "parents": [parent_folder_id], "mimeType": "application/vnd.google-apps.folder"}
+        folder_id = service.files().create(body=folder_metadata, fields="id", supportsAllDrives=True).execute().get("id")
+        print(f"Created folder {name} with ID: {folder_id}")
+
+    folder_cache[(parent_folder_id, name)] = folder_id
+    return folder_id
+
+
 # Function to move a file
 def move_file(service_account_info, file_id, new_folder_id, origin_folder_id):
     service = build_google_service(service_account_info, ["https://www.googleapis.com/auth/drive.file"], "drive", "v3")
@@ -422,6 +445,7 @@ for row_data in data.values():
 run_script("node", "build-htmls.js", os.path.dirname(os.path.abspath(__file__)))
 run_script("node", "build-pdfs.js", os.path.dirname(os.path.abspath(__file__)))
 
+folder_cache = {}
 cert_num = 1
 cert_total = data.keys().__len__()
 for cert_id in data.keys():
@@ -432,7 +456,9 @@ for cert_id in data.keys():
     email = "certificats@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
 
     print("* certificate-generator * Step 8: Upload PDF to created registry " + cert_num.__str__() + " out of " + cert_total.__str__())
-    pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, FOLDER_CREATED_ID, add_email_to_filename(os.path.basename(pdf_path), email))
+    course_id = get_id_course_from_id_cert(cert_id)
+    course_created_folder_id = get_or_create_folder(SERVICE_ACCOUNT_INFO, FOLDER_CREATED_ID, course_id, folder_cache)
+    pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, course_created_folder_id, add_email_to_filename(os.path.basename(pdf_path), email))
     write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, "I", json.loads(open(json_path).read()).get("row_number"), "yes")
 
     print("* certificate-generator * Step 9: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
@@ -449,5 +475,6 @@ for cert_id in data.keys():
 
     # Reaching this instruction implies that we have sent the PDF, so we can move from folder
     print("* certificate-generator * Step 10: Move PDF from created registry to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
-    move_file(SERVICE_ACCOUNT_INFO, pdf_id, FOLDER_SENT_ID, FOLDER_CREATED_ID)
+    course_sent_folder_id = get_or_create_folder(SERVICE_ACCOUNT_INFO, FOLDER_SENT_ID, course_id, folder_cache)
+    move_file(SERVICE_ACCOUNT_INFO, pdf_id, course_sent_folder_id, course_created_folder_id)
     cert_num += 1
