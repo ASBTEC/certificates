@@ -93,3 +93,27 @@ The phrase is stored in the `text_date` field of the certificate JSON, so the te
 3. `translations.py`: per-language month names, conjunction, day prefixes and year format, plus `format_days(days,
    language)` that builds the phrase.
 4. README: document the new tabs.
+
+## Plan: dynamic signatures
+
+Goal: the two signers of a certificate come from the course, and their position text is translated.
+
+### Spreadsheet contract
+
+- `courses_implemented`: new columns `signature1` (left signer) and `signature2` (right signer), each holding an `id`
+  of the `signatures` tab.
+- `signatures`: `id`, `sign_as`, `signature_image`, `name` (found by header name).
+  - `sign_as` enum: `SECRETARY` (secretary of ASBTEC), `PRESIDENT` (president of ASBTEC), `BAC_COORDINATOR_2026`
+    (general coordinator of the BAC Barcelona 2026). Its text is translated per course language.
+  - `signature_image`: full file name inside `template_files/` (e.g. `signature_jacastro.png`).
+  - `name`: full name printed under the signature.
+
+### Implementation steps
+
+1. `translations.py`: replace `signer_position` with a `sign_as` dict (enum → text) per language.
+2. `certificate-generator.py`: read the `signatures` tab with `read_table()`; in `parse_certificate_data` resolve
+   `signature1`/`signature2` into `{name, position, image}` objects in the JSON. Fail with an explicit error on an
+   unknown signature id, unknown `sign_as` or a missing image file.
+3. `template.html`: use `{{signature1.*}}` / `{{signature2.*}}` for image, name and position. Both signature slots use
+   `object-fit: contain` anchored at the bottom center, so any image fits without cropping.
+4. README: document the new columns and tab.

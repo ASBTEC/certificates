@@ -49,6 +49,19 @@ the spreadsheet. Accepted values are `ca` (Catalan), `es` (Spanish) and `en` (En
 any other value stops the generation with an error. The texts of each language are defined in `src/translations.py`, and the notification 
 email of each language in `src/send-emails.sh`.
 
+###### Signatures
+Each course in `courses_implemented` chooses its two signers with the columns `signature1` (left) and `signature2`
+(right), which hold an `id` of the `signatures` tab. The `signatures` tab has the columns (found by header name):
+
+- `id`: integer identifier.
+- `sign_as`: `SECRETARY`, `PRESIDENT` or `BAC_COORDINATOR_2026`. The position printed under the name is translated to
+  the language of the course (texts in `src/translations.py`).
+- `signature_image`: full file name of the image inside `template_files/` (e.g. `signature_jacastro.png`). Use images
+  cropped to the signature, without margins or watermarks: they are shown whole, centered at the bottom of the slot.
+- `name`: full name printed under the signature.
+
+Unknown ids, unknown `sign_as` values or missing image files stop the generation with an error.
+
 ###### Course dates
 The date phrase of the certificate (e.g. `els dies 28 i 29 de novembre i els dies 2 i 5 de desembre del 2024`) is built
 from the individual days of the course, in the language of the course. Row 1 of each tab is a header and columns are

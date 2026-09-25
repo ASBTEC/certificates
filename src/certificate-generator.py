@@ -186,7 +186,24 @@ def get_id_course_from_id_cert(id_cert):
         raise ValueError("the id course could not have been computed from id cert \"" + id_cert + "\"")
 
 
-def parse_certificate_data(row_number, row_data, course_metadata, metadata_university, metadata_courses, course_days):
+# Resolves a signature id of a course into the name, translated position and image of the signer.
+def build_signature(signature_id, signatures, translation):
+    if signature_id not in signatures:
+        raise ValueError(f"Unknown signature id \"{signature_id}\" in courses_implemented")
+    signature = signatures[signature_id]
+    if signature["sign_as"] not in translation["sign_as"]:
+        raise ValueError(f"Signature {signature_id} has unknown sign_as \"{signature['sign_as']}\". "
+                         f"Supported values: {', '.join(translation['sign_as'].keys())}")
+    image_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "template_files",
+                              signature["signature_image"])
+    if not os.path.isfile(image_path):
+        raise ValueError(f"Signature {signature_id} image \"{signature['signature_image']}\" not found in template_files")
+    return {"name": signature["name"], "position": translation["sign_as"][signature["sign_as"]],
+            "image": signature["signature_image"]}
+
+
+def parse_certificate_data(row_number, row_data, course_metadata, metadata_university, metadata_courses, course_days,
+                           signatures):
     d = {}
     d["id"] = row_data[0]
     d["name"] = row_data[1].encode('utf-8').decode('utf-8')
@@ -198,7 +215,9 @@ def parse_certificate_data(row_number, row_data, course_metadata, metadata_unive
 
     d["language"] = normalize_language(course_metadata["language"])
     translation = get_translation(d["language"])
-    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates")}
+    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates", "sign_as")}
+    d["signature1"] = build_signature(course_metadata["signature1"], signatures, translation)
+    d["signature2"] = build_signature(course_metadata["signature2"], signatures, translation)
 
     if d["cert_type"] in translation["cert_types"]:
         d["cert_type_text"] = translation["cert_types"][d["cert_type"]]["title"]
@@ -379,7 +398,9 @@ METADATA_MAX_ROW = 40
 data = build_dict(filter_data(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, ROW_INI, ROW_END, 'A', 'I')))
 metadata = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME,
                                                  ["id", "university", "course", "credits", "Additional_logo_suffix",
-                                                  "event_type", "language"])}
+                                                  "event_type", "language", "signature1", "signature2"])}
+signatures = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "signatures",
+                                                   ["id", "sign_as", "signature_image", "name"])}
 metadata_university = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "university", 2, METADATA_MAX_ROW, 'A', 'B'))
 metadata_courses = build_dict(read_rows(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "courses", 2, METADATA_MAX_ROW, 'A', 'B'))
 course_days = build_course_days(
@@ -393,7 +414,7 @@ data_file_paths = {}
 for row_data in data.values():
     print("* certificate-generator * Step 1: Parse row " + (r - ROW_INI + 1).__str__() + " out of " + data.values().__len__().__str__())
     course_metadata = metadata[get_id_course_from_id_cert(row_data[0])]
-    cert_data = parse_certificate_data(r, row_data, course_metadata, metadata_university, metadata_courses, course_days)
+    cert_data = parse_certificate_data(r, row_data, course_metadata, metadata_university, metadata_courses, course_days, signatures)
     cert_data_json = json.dumps(cert_data)
     save_cert_data(cert_data_json)
     r += 1
