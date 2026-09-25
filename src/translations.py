@@ -20,6 +20,7 @@ TRANSLATIONS = {
         "organised_by": ", organitzat per ASBTEC",
         "university_preposition": "a la",
         "closing": ", i perquè així consti s’expedeix aquest certificat.",
+        "event_types": {"COURSE": "curs", "CONGRESS": "congrés"},
         "sign_as": {
             "SECRETARY": "Secretari d'ASBTEC",
             "PRESIDENT": "President d'ASBTEC",
@@ -50,6 +51,7 @@ TRANSLATIONS = {
         "organised_by": ", organizado por ASBTEC",
         "university_preposition": "en la",
         "closing": ", y para que así conste se expide el presente certificado.",
+        "event_types": {"COURSE": "curso", "CONGRESS": "congreso"},
         "sign_as": {
             "SECRETARY": "Secretario de ASBTEC",
             "PRESIDENT": "Presidente de ASBTEC",
@@ -80,6 +82,7 @@ TRANSLATIONS = {
         "organised_by": ", organised by ASBTEC",
         "university_preposition": "at the",
         "closing": ", and for the record, this certificate is hereby issued.",
+        "event_types": {"COURSE": "course", "CONGRESS": "congress"},
         "sign_as": {
             "SECRETARY": "Secretary of ASBTEC",
             "PRESIDENT": "President of ASBTEC",

@@ -141,3 +141,10 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
 - Empty cell (or the legacy `-`) → `logo_-.png`, a transparent 1x1 placeholder, so the slot looks empty.
 - Template assets (images, fonts, `style.css`) live in `templates/` next to `template.html`, which sets
   `<base href="../templates/">` so the rendered HTML in `certs/` resolves bare file names there.
+
+## Plan: event type before the course name
+
+- `courses_implemented.event_type` enum: `COURSE`, `CONGRESS`. Translated per language (`event_types` in
+  `translations.py`: curs/congrés, curso/congreso, course/congress) into the `course_type` field, which the template
+  writes just before the course name: `per haver participat en el curs "Nom del curs"`.
+- Any other value, including an empty cell, stops the generation with an error.

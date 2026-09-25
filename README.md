@@ -52,6 +52,11 @@ with `no` in either are skipped), and the script writes `commit_SHA_ID` (commit 
 `-dirty` suffix if there were uncommitted changes), `url_cert` (Drive link of the PDF) and `sent` (`yes` once the email
 is sent). `university` and `courses` use `id` and `name`.
 
+###### Event type
+The `event_type` column of `courses_implemented` is `COURSE` or `CONGRESS`. It is translated to the language of the
+course and written just before the course name (e.g. `curs "Biotecnologia"`, `congress "BAC Barcelona 2026"`). Other
+values stop the generation with an error.
+
 ###### Additional logo
 The `additional_logo_file` column of `courses_implemented` holds the full file name of the logo shown at the bottom
 right of the certificate: a file name inside `templates/` (e.g. `logo_bac.png`) or a public image URL. It is used as

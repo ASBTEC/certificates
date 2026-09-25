@@ -230,7 +230,7 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
 
     d["language"] = normalize_language(course_metadata["language"])
     translation = get_translation(d["language"])
-    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates", "sign_as")}
+    d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates", "sign_as", "event_types")}
     d["signature1"] = build_signature(course_metadata["signature1"], signatures, translation)
     d["signature2"] = build_signature(course_metadata["signature2"], signatures, translation)
 
@@ -250,7 +250,12 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
         d["credits"] = int(course_metadata["credits"])
 
     d["additional_logo"] = get_additional_logo(course_metadata)
-    d["event_type"] = course_metadata["event_type"].encode('utf-8').decode('utf-8')
+    d["event_type"] = course_metadata["event_type"]
+    if d["event_type"] not in translation["event_types"]:
+        raise ValueError(f"Course {course_metadata['id']} has unknown event_type \"{d['event_type']}\". "
+                         f"Supported values: {', '.join(translation['event_types'].keys())}")
+    # Word written just before the course name, e.g. curs "Biotecnologia"
+    d["course_type"] = translation["event_types"][d["event_type"]]
     d["row_number"] = certificate_row["row_number"].__str__()
 
     if d["cert_type"] == "ALUMNE_NOTA":
