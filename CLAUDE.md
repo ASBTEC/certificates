@@ -169,3 +169,13 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
   (`EMAIL_RETRY_BASE_SECONDS * 2^n` + jitter, `EMAIL_RETRIES` times). SMTP 5xx (e.g. wrong password, unknown recipient)
   is not retried. `EMAIL_DELAY_SECONDS` pause between emails.
 - Output of the old `send-emails.sh` (`curl -v`) printed the base64 app password: never paste old logs.
+
+## Plan: organizers of a course
+
+- `organizers`: `id`, `name` (entity name, not translated). `organizers_intermediate` (N to N course ↔ organizer):
+  `course_id` (id of `courses_implemented`), `organizer_id`.
+- `build_course_organisers()` joins them into `{course_id: [names]}` in the order of the `organizers_intermediate`
+  rows, skipping repeated organizers. Unknown `organizer_id` or a course without organizers stops the generation.
+- `format_organisers()` (`translations.py`) builds the `organised_by` field: translated prefix (`organised_by`:
+  ", organitzat per" / ", organizado por" / ", organised by") + names joined with the language's list rule (`, ` and
+  i / y / and; Spanish `y` → `e` before an i sound). The template writes `{{organised_by}}`.

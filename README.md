@@ -66,6 +66,12 @@ is sent). `courses` uses `id` and `name`. `university` uses `id`, `name` and
 `logo_file`: the university logo, a file name inside `templates/` (e.g. `logo_UAB.png`) or a public image URL, used as is
 without validation. Leave it empty to show no logo.
 
+###### Organizers
+The organizers written after the course name come from the `organizers` tab (`id`, `name`) linked to each course
+through `organizers_intermediate` (`course_id`, `organizer_id`), in the order of those rows. They are joined in the
+language of the course, e.g. `organitzat per ASBTEC`, `organizado por ASBTEC y FEBiotec`,
+`organised by X, Y, ASBTEC and FEBiotec`. Every course needs at least one organizer; unknown ids stop the generation.
+
 ###### Event type
 The `event_type` column of `courses_implemented` is `COURSE` or `CONGRESS`. It is translated to the language of the
 course and written just before the course name (e.g. `curs "Biotecnologia"`, `congress "BAC Barcelona 2026"`). Other

@@ -17,7 +17,8 @@ TRANSLATIONS = {
         "student_nota_text": ", amb equivalència de {credits} crèdit(s) ECTS amb nota {mark}, acreditat per la {university_name}",
         "awarded_to": "OTORGAT A",
         "id_label": "amb DNI",
-        "organised_by": ", organitzat per ASBTEC",
+        # Followed by the organizers of the course, e.g. ", organitzat per ASBTEC i FEBiotec"
+        "organised_by": ", organitzat per",
         "university_preposition": "a la",
         "closing": ", i perquè així consti s’expedeix aquest certificat.",
         "email_subject": "Recepció del teu certificat d'ASBTEC",
@@ -65,7 +66,9 @@ TRANSLATIONS = {
         "student_nota_text": ", con equivalencia de {credits} crédito(s) ECTS con nota {mark}, acreditado por la {university_name}",
         "awarded_to": "OTORGADO A",
         "id_label": "con DNI",
-        "organised_by": ", organizado por ASBTEC",
+        "organised_by": ", organizado por",
+        # "y" becomes "e" before a word starting with an i sound (i-, hi-, but not hia-, hie-, hio-, hiu-)
+        "and_before_i": "e",
         "university_preposition": "en la",
         "closing": ", y para que así conste se expide el presente certificado.",
         "email_subject": "Recepción de tu certificado de ASBTEC",
@@ -113,7 +116,7 @@ TRANSLATIONS = {
         "student_nota_text": ", equivalent to {credits} ECTS credit(s) with a mark of {mark}, accredited by the {university_name}",
         "awarded_to": "AWARDED TO",
         "id_label": "with ID",
-        "organised_by": ", organised by ASBTEC",
+        "organised_by": ", organised by",
         "university_preposition": "at the",
         "closing": ", and for the record, this certificate is hereby issued.",
         "email_subject": "Your ASBTEC certificate",
@@ -178,6 +181,19 @@ def english_ordinal(day):
     if 11 <= day % 100 <= 13:
         return str(day) + "th"
     return str(day) + {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+
+
+# Builds the "organised by" text of a certificate from the names of its organizers, in order, e.g.
+# ", organitzat per ASBTEC", ", organitzat per ASBTEC i FEBiotec", ", organised by X, Y, ASBTEC and FEBiotec".
+def format_organisers(names, code):
+    texts = get_translation(code)
+    if not names:
+        raise ValueError("Cannot build the organised by text without organizers")
+    conjunction = texts["dates"]["and"]
+    last = names[-1].lower()
+    if "and_before_i" in texts and (last.startswith(("i", "í")) or (last.startswith(("hi", "hí")) and last[2:3] not in ("a", "e", "o", "u"))):
+        conjunction = texts["and_before_i"]
+    return texts["organised_by"] + " " + join_list(names, conjunction)
 
 
 # Builds the date phrase of a certificate from its days (datetime.date), e.g.

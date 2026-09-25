@@ -13,7 +13,7 @@ from datetime import datetime
 from googleapiclient.http import MediaFileUpload
 
 from mailer import Mailer, build_certificate_email
-from translations import format_days, get_translation, normalize_language
+from translations import format_days, format_organisers, get_translation, normalize_language
 
 
 # Read file passed as argument from secrets/ folder and return its content as string.
@@ -187,6 +187,20 @@ def build_course_days(dates_intermediate, dates, days_intermediate, days):
     return {course_id: sorted(course_day_set) for course_id, course_day_set in course_days.items()}
 
 
+# Joins organizers_intermediate -> organizers and returns {course_id: [organizer name, ...]}, keeping the order of the
+# organizers_intermediate rows and skipping repeated organizers of a course.
+def build_course_organisers(organizers_intermediate, organizers):
+    name_by_id = {row["id"]: row["name"] for row in organizers}
+    course_organisers = {}
+    for row in organizers_intermediate:
+        if row["organizer_id"] not in name_by_id:
+            raise ValueError(f"organizers_intermediate references unknown organizer_id \"{row['organizer_id']}\"")
+        names = course_organisers.setdefault(row["course_id"], [])
+        if name_by_id[row["organizer_id"]] not in names:
+            names.append(name_by_id[row["organizer_id"]])
+    return course_organisers
+
+
 def write_cell(service_account_info, spreadsheet_id, page, column, row, value):
     cell = f"{column}{row}"
     range_name = f"{page}!{cell}"
@@ -240,7 +254,7 @@ def get_logo_file(logo):
 
 
 def parse_certificate_data(certificate_row, course_metadata, metadata_university, metadata_courses, course_days,
-                           signatures):
+                           signatures, course_organisers):
     d = {}
     d["id"] = certificate_row["id"]
     d["name"] = certificate_row["name"]
@@ -253,7 +267,8 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
     d["language"] = normalize_language(course_metadata["language"])
     translation = get_translation(d["language"])
     d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates", "sign_as", "event_types",
-                                                             "email_subject", "email_body")}
+                                                             "email_subject", "email_body", "organised_by",
+                                                             "and_before_i")}
     d["signature1"] = build_signature(course_metadata["signature1"], signatures, translation)
     d["signature2"] = build_signature(course_metadata["signature2"], signatures, translation)
 
@@ -269,6 +284,10 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
     if course_metadata["id"] not in course_days:
         raise ValueError(f"Course {course_metadata['id']} has no days in dates_intermediate / days_intermediate")
     d["text_date"] = format_days(course_days[course_metadata["id"]], d["language"])
+
+    if course_metadata["id"] not in course_organisers:
+        raise ValueError(f"Course {course_metadata['id']} has no organizers in organizers_intermediate")
+    d["organised_by"] = format_organisers(course_organisers[course_metadata["id"]], d["language"])
 
     if d["cert_type"] == "ALUMNE_NOTA":
         d["credits"] = int(course_metadata["credits"])
@@ -468,12 +487,15 @@ course_days = build_course_days(
     read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "dates", ["id"]),
     read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "days_intermediate", ["date_id", "day_id"]),
     read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "days", ["id", "date"]))
+course_organisers = build_course_organisers(
+    read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "organizers_intermediate", ["course_id", "organizer_id"]),
+    read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, "organizers", ["id", "name"]))
 
 row_num = 1
 for certificate_row in data.values():
     print("* certificate-generator * Step 1: Parse row " + row_num.__str__() + " out of " + data.values().__len__().__str__())
     course_metadata = metadata[get_id_course_from_id_cert(certificate_row["id"])]
-    cert_data = parse_certificate_data(certificate_row, course_metadata, metadata_university, metadata_courses, course_days, signatures)
+    cert_data = parse_certificate_data(certificate_row, course_metadata, metadata_university, metadata_courses, course_days, signatures, course_organisers)
     cert_data_json = json.dumps(cert_data)
     save_cert_data(cert_data_json)
     row_num += 1
