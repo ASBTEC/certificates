@@ -1,6 +1,7 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+import argparse
 import os
 import shutil
 import sys
@@ -23,27 +24,47 @@ def read_secret(filename):
         raise ValueError(f"Error: File {filename} not found")
 
 
-def parse_range_arguments():
-    if len(sys.argv) < 3:
-        raise ValueError("Two arguments are required.")
+# Parses the command line: the range of _certificate_history rows to generate, the mode and --force.
+#   --production / --prod: upload to Drive, send the email to the address in the spreadsheet and write url_cert, sent
+#                           and commit_SHA_ID. Asks for confirmation unless --force is given.
+#   --test:                 send the email to secrets/TEST_EMAIL. Nothing is uploaded or written to the spreadsheet.
+#   --dev / --develop:      send the email to secrets/DEV_EMAIL. Nothing is uploaded or written to the spreadsheet.
+#                           Default mode.
+# certificats@asbtec.cat is always added as a recipient by send-emails.sh.
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Generate ASBTEC certificates from the rows of _certificate_history.")
+    parser.add_argument("first_row", type=int, help="first spreadsheet row to generate (2 or greater)")
+    parser.add_argument("last_row", type=int, help="last spreadsheet row to generate")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--production", "--prod", dest="mode", action="store_const", const="production",
+                      help="send the certificates to their recipients and archive them in Drive")
+    mode.add_argument("--test", dest="mode", action="store_const", const="test",
+                      help="send every certificate to secrets/TEST_EMAIL, without archiving")
+    mode.add_argument("--dev", "--develop", dest="mode", action="store_const", const="dev",
+                      help="send every certificate to secrets/DEV_EMAIL, without archiving (default)")
+    parser.set_defaults(mode="dev")
+    parser.add_argument("-f", "--force", action="store_true", help="skip the confirmation of the production mode")
+    args = parser.parse_args()
+
+    # Swap arguments if first_row is bigger than last_row
+    first_row, last_row = sorted((args.first_row, args.last_row))
+    if first_row < 1:
+        parser.error("Both rows must be natural numbers (greater than 0).")
+    if first_row == 1:
+        parser.error("First row must not be included in parsing range.")
+    return first_row, last_row, args.mode, args.force
+
+
+# Asks the user to confirm a production run, which sends emails to the real recipients.
+def confirm_production(certificate_count, first_row, last_row, commit_sha):
+    print(f"PRODUCTION mode: {certificate_count} certificate(s) from rows {first_row} to {last_row} will be uploaded to "
+          f"Drive and emailed to their recipients. Commit: {commit_sha}")
     try:
-        n1 = int(sys.argv[1])
-        n2 = int(sys.argv[2])
-        if n1 < 1 or n2 < 1:
-            raise ValueError("Both numbers must be natural numbers (greater than 0).")
-
-        n3 = 0
-        # Swap arguments if n1 is bigger than n2
-        if n1 > n2:
-            n3 = n2
-            n2 = n1
-            n1 = n3
-
-        if n1 == 1:
-            raise ValueError("First row must not be included in parsing range.")
-        return n1, n2
-    except ValueError as e:
-        raise ValueError(f"Invalid input: {e}")
+        answer = input("Type 'yes' to continue: ")
+    except EOFError:
+        answer = ""
+    if answer.strip().lower() != "yes":
+        sys.exit("Aborted. Use --force to skip this confirmation.")
 
 
 def build_google_service(service_account_info, scopes, service_name, version):
@@ -408,10 +429,12 @@ GOOGLE_API_RETRIES = 8
 FOLDER_SENT_ID = read_secret("FOLDER_SENT_ID.txt")
 GMAIL_USERNAME = read_secret("GMAIL_USERNAME.txt")
 GMAIL_PASSWORD = read_secret("GMAIL_PASSWORD.txt")
-TEST_EMAIL = read_secret("TEST_EMAIL.txt")
 GMAIL_FROM = read_secret("GMAIL_FROM.txt")
 
-ROW_INI, ROW_END = parse_range_arguments()
+ROW_INI, ROW_END, MODE, FORCE = parse_arguments()
+# Recipient of every certificate in test and dev modes. Production uses the email of each spreadsheet row
+MODE_EMAIL = {"test": "TEST_EMAIL", "dev": "DEV_EMAIL"}
+OVERRIDE_EMAIL = read_secret(MODE_EMAIL[MODE]) if MODE in MODE_EMAIL else None
 
 COMMIT_SHA = get_commit_sha()
 
@@ -420,6 +443,10 @@ HISTORY_HEADER, certificate_rows = read_table_rows(SERVICE_ACCOUNT_INFO, SPREADS
                                                     "sent", "url_cert", "commit_SHA_ID"])
 # Ignore rows of people that did not assist and rows not ready to be generated
 data = {row["id"]: row for row in certificate_rows if row["assisted"] != "no" and row["ready"] != "no"}
+
+print(f"* certificate-generator * Mode: {MODE}")
+if MODE == "production" and not FORCE:
+    confirm_production(len(data), ROW_INI, ROW_END, COMMIT_SHA)
 metadata = {row["id"]: row for row in read_table(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_METADATA_NAME,
                                                  ["id", "university", "course", "credits", "additional_logo_file",
                                                   "event_type", "language", "signature1", "signature2"])}
@@ -451,18 +478,17 @@ cert_total = data.keys().__len__()
 for cert_id in data.keys():
     json_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", cert_id + ".json")
     pdf_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "pdfs", cert_id + ".pdf")
-    email = json.loads(open(json_path).read()).get("email")  # Uncomment this to send it to the real destination (prod)
-    #email = "someone@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
-    email = "certificats@asbtec.cat"  # You can uncomment and / or modify this line to send to a reviewer the certificates
+    email = json.loads(open(json_path).read()).get("email") if MODE == "production" else OVERRIDE_EMAIL
 
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, column_letter(HISTORY_HEADER, "commit_SHA_ID"), json.loads(open(json_path).read()).get("row_number"), COMMIT_SHA)
+    # Only production records the certificate in the spreadsheet and archives the PDF in Drive
+    if MODE == "production":
+        write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, column_letter(HISTORY_HEADER, "commit_SHA_ID"), json.loads(open(json_path).read()).get("row_number"), COMMIT_SHA)
+        print("* certificate-generator * Step 8: Upload PDF to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
+        course_sent_folder_id = get_or_create_folder(SERVICE_ACCOUNT_INFO, FOLDER_SENT_ID, get_id_course_from_id_cert(cert_id), folder_cache)
+        pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, course_sent_folder_id, add_email_to_filename(os.path.basename(pdf_path), email))
+        write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, column_letter(HISTORY_HEADER, "url_cert"), json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(pdf_id)}")
 
-    print("* certificate-generator * Step 8: Upload PDF to sent registry " + cert_num.__str__() + " out of " + cert_total.__str__())
-    course_sent_folder_id = get_or_create_folder(SERVICE_ACCOUNT_INFO, FOLDER_SENT_ID, get_id_course_from_id_cert(cert_id), folder_cache)
-    pdf_id = upload_file_to_drive(SERVICE_ACCOUNT_INFO, pdf_path, course_sent_folder_id, add_email_to_filename(os.path.basename(pdf_path), email))
-    write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, column_letter(HISTORY_HEADER, "url_cert"), json.loads(open(json_path).read()).get("row_number"), f"https://drive.google.com/file/d/{str(pdf_id)}")
-
-    print("* certificate-generator * Step 9: Send email " + cert_num.__str__() + " out of " + cert_total.__str__())
+    print("* certificate-generator * Step 9: Send email to " + email + " " + cert_num.__str__() + " out of " + cert_total.__str__())
     try:
         run_script("bash", "send-emails.sh", os.path.dirname(os.path.abspath(__file__)),
                    [GMAIL_USERNAME, email, GMAIL_PASSWORD, cert_id.__str__(),
@@ -471,6 +497,8 @@ for cert_id in data.keys():
     except Exception:
         print("Could not send PDF " + os.path.basename(pdf_path))
     else:
-        write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, column_letter(HISTORY_HEADER, "sent"), json.loads(open(json_path).read()).get("row_number"), "yes")
+        # Only production marks the certificate as sent to its recipient
+        if MODE == "production":
+            write_cell(SERVICE_ACCOUNT_INFO, SPREADSHEET_ID, PAGE_NAME, column_letter(HISTORY_HEADER, "sent"), json.loads(open(json_path).read()).get("row_number"), "yes")
 
     cert_num += 1

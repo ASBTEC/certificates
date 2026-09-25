@@ -6,8 +6,20 @@ Contains the necessary data and code to generate the email signature of the mana
 ```shell
 python3 -m venv venv
 ./venv/bin/pip3.8 install -r requirements.txt
-./venv/bin/python3 src/certificate-generator.py
+./venv/bin/python3 src/certificate-generator.py FIRST_ROW LAST_ROW [--dev | --test | --production] [--force]
 ```
+
+`FIRST_ROW` and `LAST_ROW` are the rows of `_certificate_history` to generate. The mode decides what happens with the
+rendered certificates:
+
+| Mode | Email sent to | Uploaded to Drive | `url_cert`, `sent` and `commit_SHA_ID` written |
+|---|---|---|---|
+| `--dev` / `--develop` (default) | the address in `secrets/DEV_EMAIL` | no | no |
+| `--test` | the address in `secrets/TEST_EMAIL` | no | no |
+| `--production` / `--prod` | the address in the spreadsheet | yes | yes |
+
+`certificats@asbtec.cat` always receives a copy. `--production` asks for confirmation before generating anything;
+`--force` / `-f` skips it.
 
 ###### Bulk update of secrets
 We use `gh` CLI utility to read from a secret file that creates all of our organization secrets in bulk.
@@ -197,5 +209,5 @@ wkhtmltopdf --enable-local-file-access --margin-right 0 --margin-left 0 --margin
 npx puppeteer browsers install chrome
 
 # usage
-bash tools/clean-artifacts.sh; nvm install 18; nvm use 18; python3 -m venv venv; venv/bin/pip install -r requirements.txt; venv/bin/python3 src/certificate-generator.py 451 818
+bash tools/clean-artifacts.sh; nvm install 18; nvm use 18; python3 -m venv venv; venv/bin/pip install -r requirements.txt; venv/bin/python3 src/certificate-generator.py 451 818 --production
 

@@ -148,3 +148,13 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
   `translations.py`: curs/congrés, curso/congreso, course/congress) into the `course_type` field, which the template
   writes just before the course name: `per haver participat en el curs "Nom del curs"`.
 - Any other value, including an empty cell, stops the generation with an error.
+
+## Plan: run modes
+
+`certificate-generator.py FIRST_ROW LAST_ROW [--dev|--develop | --test | --production|--prod] [-f|--force]`
+
+- `--dev` (default): email sent to `secrets/DEV_EMAIL`. No Drive upload, nothing written to the spreadsheet.
+- `--test`: email sent to `secrets/TEST_EMAIL`. No Drive upload, nothing written to the spreadsheet.
+- `--production`: write `commit_SHA_ID`, upload to Drive, write `url_cert`, email the address in the spreadsheet,
+  write `sent`. Asks for a typed `yes` confirmation (showing the certificate count and commit) unless `--force`.
+- `send-emails.sh` always adds `certificats@asbtec.cat` as a recipient.
