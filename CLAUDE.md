@@ -187,5 +187,6 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
 - `build-pdfs.js` closes Chrome in `finally`, awaits `cropImage()` (it returns the sharp promise), prints each failure
   with the certificate name and exits with code 1 if any certificate failed, so `certificate-generator.py` stops before
   uploading or emailing.
-- Ubuntu's `kernel.apparmor_restrict_unprivileged_userns=1` can make Puppeteer's Chrome fail to launch ("No usable
-  sandbox") depending on how the terminal was started.
+- Ubuntu's `kernel.apparmor_restrict_unprivileged_userns=1` made Puppeteer's Chrome fail to launch ("No usable
+  sandbox"), so `build-pdfs.js` launches Chrome with `--no-sandbox` (`LAUNCH_OPTIONS`). It only renders our own local
+  HTML and images.

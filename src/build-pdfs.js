@@ -3,6 +3,11 @@ const path = require('path');
 const sharp = require('sharp');
 const fs = require('fs');
 
+// Chrome's sandbox cannot start when Ubuntu restricts unprivileged user namespaces
+// (kernel.apparmor_restrict_unprivileged_userns=1, "No usable sandbox"). Disabling it is acceptable here because
+// Chrome only renders our own local certificate HTML and images.
+const LAUNCH_OPTIONS = { headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] };
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -15,7 +20,7 @@ async function exampleFunction() {
 
 
 async function convertHtmlToPng(htmlFilePath, pdfFilePath) {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch(LAUNCH_OPTIONS);
     // Close the browser even if rendering fails, so failed certificates do not leave Chrome processes behind
     try {
         const page = await browser.newPage();
@@ -57,7 +62,7 @@ function cropImage(inputPath, outputPath) {
 }
 
 async function convertPngToPdf(pngPath, pdfPath) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch(LAUNCH_OPTIONS);
     console.log("Browser launched")
     try {
         const page = await browser.newPage();
