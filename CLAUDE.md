@@ -143,9 +143,11 @@ Goal: no code refers to a spreadsheet column by letter or position, so columns c
 
 ## Plan: event type before the course name
 
-- `courses_implemented.event_type` enum: `COURSE`, `CONGRESS`. Translated per language (`event_types` in
-  `translations.py`: curs/congrés, curso/congreso, course/congress) into the `course_type` field, which the template
+- `courses_implemented.event_type` enum: `COURSE`, `CONGRESS`, `CONTEST`. Translated per language (`event_types` in
+  `translations.py`: curs/congrés/concurs de, curso/congreso/concurso de, course/congress/contest of) into the `course_type` field, which the template
   writes just before the course name: `per haver participat en el curs "Nom del curs"`.
+- `CONTEST` also replaces the cert_type action text with `event_actions[CONTEST][cert_type]` (verb + "in the"), giving
+  `for having participated in the contest of "YYY"`.
 - Any other value, including an empty cell, stops the generation with an error.
 
 ## Plan: run modes

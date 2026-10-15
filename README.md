@@ -73,8 +73,10 @@ language of the course, e.g. `organitzat per ASBTEC`, `organizado por ASBTEC y F
 `organised by X, Y, ASBTEC and FEBiotec`. Every course needs at least one organizer; unknown ids stop the generation.
 
 ###### Event type
-The `event_type` column of `courses_implemented` is `COURSE` or `CONGRESS`. It is translated to the language of the
-course and written just before the course name (e.g. `curs "Biotecnologia"`, `congress "BAC Barcelona 2026"`). Other
+The `event_type` column of `courses_implemented` is `COURSE`, `CONGRESS` or `CONTEST`. It is translated to the language
+of the course and written just before the course name (e.g. `curs "Biotecnologia"`, `congress "BAC Barcelona 2026"`).
+`CONTEST` also replaces the action text of the `cert_type` (`event_actions` in `translations.py`), e.g.
+`for having participated in the contest of "YYY"`, `per haver estat membre del jurat en el concurs de "YYY"`. Other
 values stop the generation with an error.
 
 ###### Additional logo

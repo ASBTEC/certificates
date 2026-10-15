@@ -38,7 +38,17 @@ TRANSLATIONS = {
             "Atentament,\n"
             "ASBTEC"
         ),
-        "event_types": {"COURSE": "curs", "CONGRESS": "congrés"},
+        "event_types": {"COURSE": "curs", "CONGRESS": "congrés", "CONTEST": "concurs de"},
+        # Action text replacing the cert_type one for some event types, e.g. per haver participat en el concurs de "X"
+        "event_actions": {
+            "CONTEST": {
+                "ALUMNE": "per haver participat en el",
+                "ALUMNE_NOTA": "per haver participat en el",
+                "PROFE": "per haver estat membre del jurat en el",
+                "ORGANITZADOR": "per haver estat organitzador en el",
+                "VOLUNTARI": "per haver fet de voluntari en el",
+            },
+        },
         "sign_as": {
             "SECRETARY": "Secretari d'ASBTEC",
             "PRESIDENT": "President d'ASBTEC",
@@ -88,7 +98,16 @@ TRANSLATIONS = {
             "Atentamente,\n"
             "ASBTEC"
         ),
-        "event_types": {"COURSE": "curso", "CONGRESS": "congreso"},
+        "event_types": {"COURSE": "curso", "CONGRESS": "congreso", "CONTEST": "concurso de"},
+        "event_actions": {
+            "CONTEST": {
+                "ALUMNE": "por haber participado en el",
+                "ALUMNE_NOTA": "por haber participado en el",
+                "PROFE": "por haber sido miembro del jurado en el",
+                "ORGANITZADOR": "por haber sido organizador en el",
+                "VOLUNTARI": "por haber hecho de voluntario en el",
+            },
+        },
         "sign_as": {
             "SECRETARY": "Secretario de ASBTEC",
             "PRESIDENT": "Presidente de ASBTEC",
@@ -136,7 +155,16 @@ TRANSLATIONS = {
             "Kind regards,\n"
             "ASBTEC"
         ),
-        "event_types": {"COURSE": "course", "CONGRESS": "congress"},
+        "event_types": {"COURSE": "course", "CONGRESS": "congress", "CONTEST": "contest of"},
+        "event_actions": {
+            "CONTEST": {
+                "ALUMNE": "for having participated in the",
+                "ALUMNE_NOTA": "for having participated in the",
+                "PROFE": "for having been a jury member in the",
+                "ORGANITZADOR": "for having been an organiser in the",
+                "VOLUNTARI": "for having volunteered in the",
+            },
+        },
         "sign_as": {
             "SECRETARY": "Secretary of ASBTEC",
             "PRESIDENT": "President of ASBTEC",

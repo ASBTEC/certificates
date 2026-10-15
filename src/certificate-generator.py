@@ -267,6 +267,7 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
     d["language"] = normalize_language(course_metadata["language"])
     translation = get_translation(d["language"])
     d["i18n"] = {key: value for key, value in translation.items() if key not in ("cert_types", "student_nota_text", "dates", "sign_as", "event_types",
+                                                             "event_actions",
                                                              "email_subject", "email_body", "organised_by",
                                                              "and_before_i")}
     d["signature1"] = build_signature(course_metadata["signature1"], signatures, translation)
@@ -299,6 +300,10 @@ def parse_certificate_data(certificate_row, course_metadata, metadata_university
                          f"Supported values: {', '.join(translation['event_types'].keys())}")
     # Word written just before the course name, e.g. curs "Biotecnologia"
     d["course_type"] = translation["event_types"][d["event_type"]]
+    # Some event types (CONTEST) replace the action of the cert_type, e.g. per haver participat en el concurs de "X"
+    event_actions = translation["event_actions"].get(d["event_type"], {})
+    if d["cert_type"] in event_actions:
+        d["action_text"] = event_actions[d["cert_type"]]
     d["row_number"] = certificate_row["row_number"].__str__()
 
     if d["cert_type"] == "ALUMNE_NOTA":
