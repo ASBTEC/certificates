@@ -38,7 +38,7 @@ TRANSLATIONS = {
             "Atentament,\n"
             "ASBTEC"
         ),
-        "event_types": {"COURSE": "curs", "CONGRESS": "congrés", "CONTEST": "concurs de"},
+        "event_types": {"COURSE": "curs", "CONGRESS": "congrés", "CONTEST": "concurs de", "SEMINAR": "seminari"},
         # Action text replacing the cert_type one for some event types, e.g. per haver participat en el concurs de "X"
         "event_actions": {
             "CONTEST": {
@@ -98,7 +98,7 @@ TRANSLATIONS = {
             "Atentamente,\n"
             "ASBTEC"
         ),
-        "event_types": {"COURSE": "curso", "CONGRESS": "congreso", "CONTEST": "concurso de"},
+        "event_types": {"COURSE": "curso", "CONGRESS": "congreso", "CONTEST": "concurso de", "SEMINAR": "seminario"},
         "event_actions": {
             "CONTEST": {
                 "ALUMNE": "por haber participado en el",
@@ -155,7 +155,7 @@ TRANSLATIONS = {
             "Kind regards,\n"
             "ASBTEC"
         ),
-        "event_types": {"COURSE": "course", "CONGRESS": "congress", "CONTEST": "contest of"},
+        "event_types": {"COURSE": "course", "CONGRESS": "congress", "CONTEST": "contest of", "SEMINAR": "seminar"},
         "event_actions": {
             "CONTEST": {
                 "ALUMNE": "for having participated in the",
