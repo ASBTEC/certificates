@@ -15,7 +15,7 @@ TRANSLATIONS = {
             "VOLUNTARI": {"title": "Certificat de voluntariat", "action": "per haver fet de voluntari en el"},
         },
         "student_nota_text": ", amb equivalència de {credits} crèdit(s) ECTS amb nota {mark}, acreditat per la {university_name}",
-        "awarded_to": "OTORGAT A",
+        "awarded_to": "ATORGAT A",
         "id_label": "amb DNI",
         # Followed by the organizers of the course, e.g. ", organitzat per ASBTEC i FEBiotec"
         "organised_by": ", organitzat per",
